@@ -1,0 +1,3 @@
+-cp Src
+-lib heaps
+-main Main

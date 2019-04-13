@@ -4,6 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "JS DEBUG",
             "type": "haxe",
             "args": "active configuration",
             "problemMatcher": [
@@ -16,6 +17,17 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "HL DEBUG",
+            "type": "hxml",
+            "file": "hl.hxml",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ]
         }
     ]
 }

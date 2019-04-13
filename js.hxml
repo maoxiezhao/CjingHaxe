@@ -1,0 +1,4 @@
+base.hxml
+
+-js Bin/Main.js
+-debug
