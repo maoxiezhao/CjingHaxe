@@ -1,4 +1,4 @@
 base.hxml
 
--js Bin/Main.js
+-js bin/Client.js
 -debug
