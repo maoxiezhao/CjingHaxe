@@ -2,6 +2,8 @@ package game.entity;
 
 import h2d.col.Point;
 import h2d.Object;
+import helper.Animation;
+import helper.AnimationSprite;
 
 enum EntityType
 {
@@ -14,21 +16,32 @@ enum EntityType
 class Entity
 {
     private var mName:String = "";
+    private var mLayer:Int = 0;
     public var mPos:Point = new Point(0, 0);
+    public var mDir:Directions = Direction_Up;
+
     public var mBaseObject:Object;
     public var mEntityType:EntityType = EntityType_Unknown;
     public var mCurrentMap:GameMap;
+
+    // TODO: Add Component, 将Animation、Movement实现为Component，
+    public var mAnimations:Array<AnimationSprite>;
 
     public function new(name:String)
     {
         mName = name;
         mBaseObject = new Object();
         mBaseObject.setPosition(mPos.x, mPos.y);
+
+        mAnimations = new Array();
     }
 
     public function Update(dt:Float)
     {
-        
+        for (animation in mAnimations)
+        {
+            animation.Dispose();
+        }
     }
 
     public function GetName()
@@ -50,7 +63,30 @@ class Entity
 
     public function Dispose()
     {
+        for (animation in mAnimations)
+        {
+            animation.Dispose();
+        }
+        mAnimations = null;
+
         mCurrentMap = null;
         mBaseObject = null;
+    }
+
+    public function SetLayer(layer:Int)
+    {
+        mLayer = layer;
+    }
+
+    public function GetLayer()
+    {
+        return mLayer;
+    }
+
+    public function CreateAnimationSprite(options:Array<AnimationOption>)
+    {
+        var animationSprite = new AnimationSprite(this, options);
+        mAnimations.push(animationSprite);
+        return animationSprite;
     }
 }

@@ -3,6 +3,8 @@ base.hxml
 -lib hldx
 -D standalone
 -D windowSize=1024x768
+-D windowTitle=CjingJumper
+
 -hl bin/Client.hl
 
 -debug
