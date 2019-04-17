@@ -24,16 +24,26 @@ class AnimationOptionLoader
             return null;
         }
 
-        var option = GetDefualtOption();
+        var animationOptions:Array<AnimationOption> = [];
         var data = hxd.Res.loader.load(fullPath);
-        var jsonData:AnimationLoaderOption = Json.parse(data.toText());
+        var jsonDatas:Array<Dynamic> = Json.parse(data.toText());
+        for(jsonData in jsonDatas)
+        {
+            var jsonOption:AnimationLoaderOption = jsonData;
 
-        option.name = jsonData.name;
-        option.loop = (jsonData.frame_loop == 1);
-        option.speed = Std.int(1000 / jsonData.frame_delay);
-        option.directions = jsonData.directions.copy();
-    
-        return option;
+            var animationOption = GetDefualtOption();
+            animationOption.name = jsonOption.name;
+
+            var imgfullPath:String = "img/" + jsonOption.src_image;
+            animationOption.srcImg = hxd.Res.loader.load(imgfullPath).toImage();
+            animationOption.loop = (jsonOption.frame_loop == 1);
+            animationOption.speed = Std.int(1000 / jsonOption.frame_delay);
+            animationOption.directions = jsonOption.directions.copy();
+
+            animationOptions.push(animationOption);
+        }
+
+        return animationOptions;
     }
 
     static public function GetDefualtOption()

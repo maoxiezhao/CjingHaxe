@@ -8,7 +8,8 @@ class AnimationSprite
     public var mAnimationMap:Map<String, Animation>;
     public var mAnimationArray:Array<Animation>;
     public var mCurrentAnimation:Animation;
-    
+    public var mCurrentDirection:Directions = Directoin_Right;
+
     public function new(entity:Entity, options:Array<AnimationOption>)
     {
         mAnimationMap = new Map();
@@ -29,7 +30,7 @@ class AnimationSprite
         }
     }
 
-    public function Play(animName:String, dir:Directions, ?endCallBack:Void -> Void)
+    public function Play(animName:String, ?force_dir:Directions, ?endCallBack:Void -> Void)
     {
         if (mCurrentAnimation != null)
         {
@@ -41,7 +42,21 @@ class AnimationSprite
         if (animation != null)
         {
             mCurrentAnimation = animation;
+
+            var dir = mCurrentDirection;
+            if (force_dir != null) {
+                dir = force_dir;
+            }
             mCurrentAnimation.Play(dir, endCallBack);
+        }
+    }
+
+    public function StopAll()
+    {
+        if (mCurrentAnimation != null)
+        {
+            mCurrentAnimation.Stop();
+            mCurrentAnimation = null;
         }
     }
 
@@ -61,4 +76,15 @@ class AnimationSprite
         }
     }
 
+    public function SetCurrentDirection(direction:Directions)
+    {
+        mCurrentDirection = direction;
+
+        // TODO:更改方向，直接改动画可能有问题
+        if (mCurrentAnimation != null)
+        {
+            mCurrentAnimation.Stop();
+            mCurrentAnimation.Play(mCurrentDirection);
+        }
+    }
 }

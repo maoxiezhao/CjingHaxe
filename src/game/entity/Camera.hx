@@ -7,13 +7,30 @@ class Camera extends Entity
 
     public function new()
     {
-        super("Camera");
+        super("Camera", EntityType_Camera);
 
-        mEntityType = EntityType_Camera;
+    }
+
+    public function TraceTarget(target:Entity, ?immediate = false)
+    {
+        if (target == mTarget) {
+            return;
+        }
+
+        mTarget = target;
+
+        if (immediate == true) {
+            AdaptCamera();
+        }
+    }
+
+    private function AdaptCamera()
+    {
+
     }
 
     override function Update(dt:Float)
     {
-        
+        super.Update(dt);
     }
 }

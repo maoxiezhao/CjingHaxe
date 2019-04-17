@@ -12,9 +12,6 @@ enum Directions
     Direction_Left;
 }
 
-// TODO:
-// Animation Options应该保存在文件中，
-// 目前则直接传入
 typedef AnimationDirection = {
     x:Int, 
     y:Int,
