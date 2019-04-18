@@ -29,13 +29,14 @@ class AnimationManager
     public var mCurrentState:AnimationState = null;
     public var mNextState:AnimationState = null;
 
-    public var mAnimationConditions:Map<String, AnimationCondition>;
+    private var mEnableAnimationConditon:Bool = false;
+    private var mAnimationConditions:Array<AnimationCondition>;
 
     public function new()
     {
         mAnimationStates = new Map();
         mAnimationTransitions = new Map();
-        mAnimationConditions = new Map();
+        mAnimationConditions = new Array();
     }
 
     public function AddState(name:String, animation:AnimationSprite)
@@ -76,6 +77,9 @@ class AnimationManager
             }
             else 
             {
+                if (mCurrentState.name == name){
+                    return;
+                }
                 mNextState = mAnimationStates.get(name);
             }
         }
@@ -104,12 +108,32 @@ class AnimationManager
     // 添加状态机条件函数，当条件满足时会自动requestState
     public function RegisterStateCondition(name:String, priority:Int, condition:Void->Bool, ?is_force:Bool = false)
     {
+        if (condition == null)
+            return;
 
+        mAnimationConditions.push({
+            name:name,
+            priority: priority,
+            condition: condition
+        });
+        mAnimationConditions.sort(function(a, b) 
+            return -Reflect.compare(a.priority, b.priority));
+    }
+
+    public function RemoveStateCondition(name:String, priority:Int)
+    {
+        for(condition in mAnimationConditions)
+        {
+            if (condition.name == name && condition.priority == priority)
+            {
+                mAnimationConditions.remove(condition);
+                break;
+            }
+        }
     }
 
     public function Update(dt:Float)
     {
-        // 暂时不处理trnasition
         if (mNextState != null)
         {
             if (mCurrentState != null) {
@@ -122,5 +146,22 @@ class AnimationManager
             
             InitializeAnimation(mCurrentState);
         }
+
+        if (mEnableAnimationConditon == true) 
+        {
+            for (condition in mAnimationConditions)
+            {
+                if (condition.condition())
+                {
+                    RequestState(condition.name);
+                    break;
+                }
+            }
+        }
+    }
+
+    public function SetEnableAnimationConditon(enable:Bool)
+    {
+        mEnableAnimationConditon = enable;
     }
 }

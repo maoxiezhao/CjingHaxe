@@ -24,8 +24,10 @@ class Entity
     public var mDir:Directions = Direction_Up;
 
     public var mBaseObject:Object;
-    public var mAnimationManager:AnimationManager;
     public var mCurrentMap:GameMap;
+
+    // TODO: move other places
+    public var mAnimationManager:AnimationManager;
 
     // TODO: Add Component, 将Animation、Movement实现为Component，
     public var mAnimations:Array<AnimationSprite>;
@@ -91,6 +93,7 @@ class Entity
     public function CreateAnimationSpriteFromOptions(options:Array<AnimationOption>)
     {
         var animationSprite = new AnimationSprite(this, options);
+        animationSprite.SetCurrentDirection(mDir);
         mAnimations.push(animationSprite);
         return animationSprite;
     }

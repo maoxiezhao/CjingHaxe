@@ -15,7 +15,7 @@
     "name" : "shifting",
     "src_image" : "player_a.png",
     "frame_delay" : 150,
-    "frame_loop" : 0,
+    "frame_loop" : 1,
     "directions" : [
       { "x" : 0, "y" : 128,  "width" : 40, "height" : 32, "numFrames" : 2},
       { "x" : 0, "y" : 128,  "width" : 40, "height" : 32, "numFrames" : 2},

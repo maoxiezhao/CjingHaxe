@@ -1,5 +1,6 @@
 package helper;
 
+import h2d.Object;
 import helper.Animation;
 import game.entity.Entity;
 
@@ -9,20 +10,22 @@ class AnimationSprite
     public var mAnimationArray:Array<Animation>;
     public var mCurrentAnimation:Animation;
     public var mCurrentDirection:Directions = Directoin_Right;
+    public var mBaseObject:Object;
 
     public function new(entity:Entity, options:Array<AnimationOption>)
     {
         mAnimationMap = new Map();
         mAnimationArray = new Array();
 
+        mBaseObject = new Object();
+        entity.mBaseObject.addChild(mBaseObject);
+        
         for(option in options)
         {
             var name = option.name;
             var animation = new Animation(option);
             mAnimationMap.set(name, animation);
             mAnimationArray.push(animation);
-
-            entity.mBaseObject.addChild(animation.mAnimPlayer);
         }
 
         if (mAnimationArray.length > 0) {
@@ -34,6 +37,7 @@ class AnimationSprite
     {
         if (mCurrentAnimation != null)
         {
+            mBaseObject.removeChild(mCurrentAnimation.mAnimPlayer);
             mCurrentAnimation.Stop();
             mCurrentAnimation = null;
         }
@@ -48,6 +52,7 @@ class AnimationSprite
                 dir = force_dir;
             }
             mCurrentAnimation.Play(dir, endCallBack);
+            mBaseObject.addChild(mCurrentAnimation.mAnimPlayer);
         }
     }
 

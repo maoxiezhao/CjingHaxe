@@ -55,7 +55,8 @@ class GameMap
             }
             mNameEntitiesMap.set(name, entity);
         }
-        
+        mEntities.push(entity);
+
         entity.SetLayer(layerIndex);
         entity.SetCurrentMap(this);
     }
