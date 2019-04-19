@@ -3,9 +3,16 @@ package helper;
 import helper.Animation.Directions;
 import helper.AnimationSprite;
 
+typedef AnimationStateFunc = {
+    ?onEnter:Void->Void,
+    ?onUpdate:Void->Void,
+    ?onLeave:Void->Void
+}
+
 typedef AnimationState = {
     ?name:String,
-    ?animation:AnimationSprite
+    ?animation:AnimationSprite,
+    ?func:AnimationStateFunc
 }
 
 typedef AnimationTransition = {
@@ -20,8 +27,7 @@ typedef AnimationCondition = {
 }
 
 // TODO:
-// 1.add callback after animation finished
-// 2.support state condition
+// 1. use transition condition or state func??, use state func now.
 class AnimationManager
 {
     public var mAnimationStates:Map<String, AnimationState>;
@@ -29,21 +35,22 @@ class AnimationManager
     public var mCurrentState:AnimationState = null;
     public var mNextState:AnimationState = null;
 
-    private var mEnableAnimationConditon:Bool = false;
-    private var mAnimationConditions:Array<AnimationCondition>;
+    private var mGlobalAnimationConditionEnable:Bool = false;
+    private var mGlobalAnimationConditions:Array<AnimationCondition>;
 
     public function new()
     {
         mAnimationStates = new Map();
         mAnimationTransitions = new Map();
-        mAnimationConditions = new Array();
+        mGlobalAnimationConditions = new Array();
     }
 
-    public function AddState(name:String, animation:AnimationSprite)
+    public function AddState(name:String, animation:AnimationSprite, ?func:AnimationStateFunc)
     {
         var animationState:AnimationState = {};
         animationState.name = name;
         animationState.animation = animation;
+        animationState.func = func;
 
         mAnimationStates.set(name, animationState);
     }
@@ -53,17 +60,23 @@ class AnimationManager
     {
         if (HasState(name) == true)
         {
-            if (mCurrentState != null) {
-                ClearAnimation(mCurrentState);
-                mCurrentState = null;
-            }
             if (mNextState != null) {
-                ClearAnimation(mNextState);
+                LeaveState(mNextState);
                 mNextState = null;
             }
 
+            if (mCurrentState != null && mCurrentState.name == name) {
+                return;
+            }
+
+            if (mCurrentState != null) 
+            {
+                LeaveState(mCurrentState);
+                mCurrentState = null;
+            }
+            
             mCurrentState = mAnimationStates.get(name);
-            InitializeAnimation(mCurrentState);
+            EnterState(mCurrentState);
         }
     }
 
@@ -90,16 +103,24 @@ class AnimationManager
         return mAnimationStates.exists(name);
     }
 
-    private function InitializeAnimation(state:AnimationState)
+    private function EnterState(state:AnimationState)
     {
+        if (state.func != null && state.func.onEnter != null) {
+            state.func.onEnter();
+        }
+
         if (state != null && state.animation != null) {
             var dir:Directions = state.animation.mCurrentDirection;
             state.animation.Play(state.name, dir);
         }
     }
 
-    private function ClearAnimation(state:AnimationState)
+    private function LeaveState(state:AnimationState)
     {
+        if (state.func != null && state.func.onLeave != null) {
+            state.func.onLeave();
+        }
+
         if (state != null && state.animation != null) {
             state.animation.StopAll();
         }
@@ -111,22 +132,22 @@ class AnimationManager
         if (condition == null)
             return;
 
-        mAnimationConditions.push({
+        mGlobalAnimationConditions.push({
             name:name,
             priority: priority,
             condition: condition
         });
-        mAnimationConditions.sort(function(a, b) 
+        mGlobalAnimationConditions.sort(function(a, b) 
             return -Reflect.compare(a.priority, b.priority));
     }
 
     public function RemoveStateCondition(name:String, priority:Int)
     {
-        for(condition in mAnimationConditions)
+        for(condition in mGlobalAnimationConditions)
         {
             if (condition.name == name && condition.priority == priority)
             {
-                mAnimationConditions.remove(condition);
+                mGlobalAnimationConditions.remove(condition);
                 break;
             }
         }
@@ -137,19 +158,19 @@ class AnimationManager
         if (mNextState != null)
         {
             if (mCurrentState != null) {
-                ClearAnimation(mCurrentState);
+                LeaveState(mCurrentState);
                 mCurrentState = null;
             }
 
             mCurrentState = mNextState;
+            EnterState(mCurrentState);
+
             mNextState = null;
-            
-            InitializeAnimation(mCurrentState);
         }
 
-        if (mEnableAnimationConditon == true) 
+        if (mGlobalAnimationConditionEnable == true) 
         {
-            for (condition in mAnimationConditions)
+            for (condition in mGlobalAnimationConditions)
             {
                 if (condition.condition())
                 {
@@ -158,10 +179,16 @@ class AnimationManager
                 }
             }
         }
+
+        if (mCurrentState != null)
+        {
+            if (mCurrentState.func != null && mCurrentState.func.onUpdate != null)
+                mCurrentState.func.onUpdate();
+        }
     }
 
-    public function SetEnableAnimationConditon(enable:Bool)
+    public function SetGlobalAnimationConditonEnable(enable:Bool)
     {
-        mEnableAnimationConditon = enable;
+        mGlobalAnimationConditionEnable = enable;
     }
 }

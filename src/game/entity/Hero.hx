@@ -23,12 +23,12 @@ class Hero extends Entity
         SetPosition(600, 300);
 
         var animationManger = GetAnimationManger();
-        animationManger.AddState("walking", mBody);
+        animationManger.AddState("walking", mBody, {null, });
         animationManger.AddState("shifting", mBody);
 
-        animationManger.SetEnableAnimationConditon(true);
-        animationManger.RegisterStateCondition("shifting", 1, function()return IsRunning());
-        animationManger.RegisterStateCondition("walking", 0, function()return true);
+        // animationManger.SetGlobalAnimationConditonEnable(true);
+        // animationManger.RegisterStateCondition("shifting", 1, function()return IsRunning());
+        // animationManger.RegisterStateCondition("walking", 0, function()return true);
     }
 
     public function IsRunning()
