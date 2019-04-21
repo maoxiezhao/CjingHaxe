@@ -15,13 +15,14 @@ enum EntityType
 }
 
 // base entity class
+// TODO: 1.add paused status 
 class Entity
 {
     private var mName:String = "";
     private var mLayer:Int = 0;
-    public var mEntityType:EntityType = EntityType_Unknown;
-    public var mPos:Point = new Point(0, 0);
-    public var mDir:Directions = Direction_Up;
+    private var mEntityType:EntityType = EntityType_Unknown;
+    private var mPos:Point = new Point(0, 0);
+    private var mDir:Directions = Direction_Left;
 
     public var mBaseObject:Object;
     public var mCurrentMap:GameMap;
@@ -100,12 +101,24 @@ class Entity
 
     public function CreateAnimationSprite(path:String)
     {
-        var options:Array<AnimationOption> = AnimationOptionLoader.LoadFromJson("player_a");
+        var options:Array<AnimationOption> = AnimationOptionLoader.LoadFromJson(path);
         return CreateAnimationSpriteFromOptions(options);
     }
 
     public function GetAnimationManger()
     {
         return mAnimationManager;
+    }
+
+    public function GetDirection(){ return mDir;}
+    public function SetDirection(dir:Directions)
+    {
+        if (mDir != dir)
+        {
+            mDir = dir;
+            for (animation in mAnimations) {
+                animation.SetCurrentDirection(dir);
+            }
+        }
     }
 }

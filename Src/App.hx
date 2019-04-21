@@ -3,7 +3,9 @@ package;
 import h3d.impl.MacroHelper;
 import hxd.App;
 import game.Game;
+import game.Assets;
 import hxd.System;
+import helper.Log;
 
 typedef AppOptions = {
     ?name:String,
@@ -33,11 +35,13 @@ class App extends hxd.App
         hxd.Res.initEmbed({compressSounds:true});
 
         helper.Data.load(hxd.Res.data.entry.getBytes().toString());
+
+        Logger.Info("The App Staring.");
     }
 
     override function init()
     {
-        engine.backgroundColor = 0xFFFFFFFF;//0xCC<<24|0x0;
+        engine.backgroundColor = 0xCC<<24|0x0;
         #if (hl)
         engine.fullScreen = false;
         #end

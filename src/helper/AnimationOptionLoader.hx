@@ -50,7 +50,7 @@ class AnimationOptionLoader
     {
         var option:AnimationOption =  {
             name : "",
-            srcImg : hxd.Res.img.player_a_png,
+            srcImg : null,
             speed: 6,
             loop : true,
             directions : [

@@ -6,10 +6,10 @@ import hxd.res.Image;
 // 方向定义为上、右、下、左
 enum Directions
 {
-    Direction_Up;
     Directoin_Right;
-    Direction_Down;
     Direction_Left;
+    Direction_Down;
+    Direction_Up;
 }
 
 typedef AnimationDirection = {

@@ -1,0 +1,22 @@
+[
+  {
+    "name" : "idle",
+    "src_image" : "player.png",
+    "frame_delay" : 150,
+    "frame_loop" : 1,
+    "directions" : [
+      { "x" : 0, "y" : 0,  "width" : 32, "height" : 32, "numFrames" : 4},
+      { "x" : 0, "y" : 160,  "width" : 32, "height" : 32, "numFrames" : 4}
+    ]
+  },
+  {
+    "name" : "walking",
+    "src_image" : "player.png",
+    "frame_delay" : 150,
+    "frame_loop" : 1,
+    "directions" : [
+      { "x" : 0, "y" : 32,  "width" : 32, "height" : 32, "numFrames" : 4},
+      { "x" : 0, "y" : 192,  "width" : 32, "height" : 32, "numFrames" : 4}
+    ]
+  }
+]

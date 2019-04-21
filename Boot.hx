@@ -7,8 +7,8 @@ class Boot
     {
         mGameApp = new App({
             name : "Jump Man",
-            width : 1024, 
-            height: 768
+            width : 800, 
+            height: 600
         });
     }
 

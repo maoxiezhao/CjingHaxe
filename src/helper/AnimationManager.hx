@@ -3,16 +3,10 @@ package helper;
 import helper.Animation.Directions;
 import helper.AnimationSprite;
 
-typedef AnimationStateFunc = {
-    ?onEnter:Void->Void,
-    ?onUpdate:Void->Void,
-    ?onLeave:Void->Void
-}
-
 typedef AnimationState = {
     ?name:String,
     ?animation:AnimationSprite,
-    ?func:AnimationStateFunc
+    ?caller:AnimationStateCaller
 }
 
 typedef AnimationTransition = {
@@ -35,6 +29,8 @@ class AnimationManager
     public var mCurrentState:AnimationState = null;
     public var mNextState:AnimationState = null;
 
+    public var mAnyValueMap:Map<String, Dynamic>;
+
     private var mGlobalAnimationConditionEnable:Bool = false;
     private var mGlobalAnimationConditions:Array<AnimationCondition>;
 
@@ -43,14 +39,22 @@ class AnimationManager
         mAnimationStates = new Map();
         mAnimationTransitions = new Map();
         mGlobalAnimationConditions = new Array();
+        mAnyValueMap = new Map();
     }
 
-    public function AddState(name:String, animation:AnimationSprite, ?func:AnimationStateFunc)
+    public function AddState(name:String, animation:AnimationSprite, ?caller:AnimationStateCaller)
     {
         var animationState:AnimationState = {};
         animationState.name = name;
         animationState.animation = animation;
-        animationState.func = func;
+
+        if (caller != null)
+        {
+            caller.mName = name;
+            caller.mAnimationManger = this;
+            
+            animationState.caller = caller;
+        }
 
         mAnimationStates.set(name, animationState);
     }
@@ -105,8 +109,8 @@ class AnimationManager
 
     private function EnterState(state:AnimationState)
     {
-        if (state.func != null && state.func.onEnter != null) {
-            state.func.onEnter();
+        if (state.caller != null) {
+            state.caller.OnEnter();
         }
 
         if (state != null && state.animation != null) {
@@ -117,8 +121,8 @@ class AnimationManager
 
     private function LeaveState(state:AnimationState)
     {
-        if (state.func != null && state.func.onLeave != null) {
-            state.func.onLeave();
+        if (state.caller != null) {
+            state.caller.OnLeave();
         }
 
         if (state != null && state.animation != null) {
@@ -139,6 +143,12 @@ class AnimationManager
         });
         mGlobalAnimationConditions.sort(function(a, b) 
             return -Reflect.compare(a.priority, b.priority));
+
+        // ex.
+        // animationManger.RequestState("idle");
+        // animationManger.SetGlobalAnimationConditonEnable(true);
+        // animationManger.RegisterStateCondition("shifting", 1, function()return IsRunning());
+        // animationManger.RegisterStateCondition("walking", 0, function()return true);
     }
 
     public function RemoveStateCondition(name:String, priority:Int)
@@ -182,8 +192,8 @@ class AnimationManager
 
         if (mCurrentState != null)
         {
-            if (mCurrentState.func != null && mCurrentState.func.onUpdate != null)
-                mCurrentState.func.onUpdate();
+            if (mCurrentState.caller != null )
+                mCurrentState.caller.OnUpdate();
         }
     }
 
