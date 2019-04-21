@@ -2,17 +2,13 @@ package game.entity;
 
 import h2d.col.Point;
 import h2d.Object;
+import game.GameCommand;
+import game.entity.EntityInclude;
 import helper.Animation;
 import helper.AnimationSprite;
 import helper.AnimationOptionLoader;
 import helper.AnimationManager;
 
-enum EntityType
-{
-    EntityType_Unknown;
-    EntityType_Hero;
-    EntityType_Camera;
-}
 
 // base entity class
 // TODO: 1.add paused status 
@@ -120,5 +116,10 @@ class Entity
                 animation.SetCurrentDirection(dir);
             }
         }
+    }
+
+    public function NotifyGameCommand(commandEvent:GameCommandEvent)
+    {
+        
     }
 }

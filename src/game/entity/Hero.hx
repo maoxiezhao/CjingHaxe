@@ -6,6 +6,7 @@ import hxd.res.Image;
 import hxd.Res;
 import helper.Animation.AnimationOption;
 import game.animationStates.NormalEntity;
+import game.GameCommand;
 
 class Hero extends Entity
 {
@@ -29,12 +30,16 @@ class Hero extends Entity
     {
         super.Update(dt);
         
+    }
+
+    override function NotifyGameCommand(commandEvent:GameCommandEvent)
+    {
         var dir = GetDirection();
-        if (Key.isDown(Key.RIGHT))
+        if (commandEvent.command == GameCommand_Right && commandEvent.isPressed)
         {
             dir = Directoin_Right;
         }
-        else if(Key.isDown(Key.LEFT))
+        else if(commandEvent.command == GameCommand_Left && commandEvent.isPressed)
         {
             dir = Direction_Left;
         }

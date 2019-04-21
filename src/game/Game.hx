@@ -1,6 +1,7 @@
 package game;
 
 import game.entity.Hero;
+import game.GameCommand;
 import h2d.Layers;
 import h2d.Mask;
 import hxd.Key;
@@ -13,6 +14,7 @@ class Game
     public var mCurrentMap:GameMap = null;
     public var mNextMap:GameMap = null;
     public var mRootLayer:h2d.Layers;
+    public var mGameCommandManager:GameCommandManager;
 
     public function new(currentApp:App)
     {
@@ -22,15 +24,21 @@ class Game
         mCurrentMap = new GameMap(this);
         mHero = new Hero();
 
-        Logger.Info("The Game Staring.");
+        mGameCommandManager = new GameCommandManager(this);
+        mGameCommandManager.BindDefaultCommand();
 
+        Logger.Info("The Game Staring.");
         mCurrentMap.LoadMap("tutorial");
         mCurrentMap.AddEntity(mHero);
     }
 
     public function Update(dt:Float)
     {
-        mCurrentMap.Update(dt);
+        mGameCommandManager.CheckInput();
+
+        if (mCurrentMap != null) {
+            mCurrentMap.Update(dt);
+        }
 
     #if debug
         if (Key.isReleased(Key.ESCAPE)) {
@@ -42,5 +50,10 @@ class Game
     public function Dispose()
     {
         mCurrentMap.Dispose();
+    }
+
+    public function NotifyGameCommand(commandEvent:GameCommandEvent)
+    {
+        mHero.NotifyGameCommand(commandEvent);
     }
 }

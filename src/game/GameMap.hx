@@ -1,5 +1,6 @@
 package game;
 
+import game.GameCommand;
 import game.entity.Camera;
 import game.entity.Entity;
 import h2d.Bitmap;
@@ -146,5 +147,10 @@ class GameMap
     public function CheckCollision()
     {
         return true;     
+    }
+
+    public function NotifyGameCommand(commandEvent:GameCommandEvent)
+    {
+      
     }
 }
