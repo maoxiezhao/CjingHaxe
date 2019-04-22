@@ -7,6 +7,7 @@ import hxd.Res;
 import helper.Animation.AnimationOption;
 import game.animationStates.NormalEntity;
 import game.GameCommand;
+import game.component.Movement;
 
 class Hero extends Entity
 {
@@ -24,6 +25,9 @@ class Hero extends Entity
         var idelState = NormalEntity.CreateIdelState(this);
         animationManger.AddState("idle", mBody, idelState);
         animationManger.AddState("walking", mBody);
+
+        var components = GetComponents();
+        components.Add(new Movement("PlayerMove"));
     }
 
     override function Update(dt:Float)

@@ -3,6 +3,7 @@ package game.entity;
 import h2d.col.Point;
 import h2d.Object;
 import game.GameCommand;
+import game.Component;
 import game.entity.EntityInclude;
 import helper.Animation;
 import helper.AnimationSprite;
@@ -23,11 +24,14 @@ class Entity
     public var mBaseObject:Object;
     public var mCurrentMap:GameMap;
 
+    // TODO: will refactor component
+    private var mComponents:ComponentManager;
+
     // TODO: move other places
-    public var mAnimationManager:AnimationManager;
+    private var mAnimationManager:AnimationManager;
 
     // TODO: Add Component, 将Animation、Movement实现为Component，
-    public var mAnimations:Array<AnimationSprite>;
+    private var mAnimations:Array<AnimationSprite>;
 
     public function new(name:String, entityType:EntityType)
     {
@@ -36,12 +40,16 @@ class Entity
         mBaseObject = new Object();
         mBaseObject.setPosition(mPos.x, mPos.y);
 
+        mComponents = new ComponentManager(this);
+
         mAnimationManager = new AnimationManager();
         mAnimations = new Array();
     }
 
     public function Update(dt:Float)
     {
+        mComponents.Update(dt);
+
         for (animation in mAnimations) {
             animation.Update(dt);
         }
@@ -67,6 +75,8 @@ class Entity
 
     public function Dispose()
     {
+        mComponents.Dispose();
+        
         for (animation in mAnimations)
         {
             animation.Dispose();
@@ -104,6 +114,11 @@ class Entity
     public function GetAnimationManger()
     {
         return mAnimationManager;
+    }
+
+    public function GetComponents()
+    {
+        return mComponents;
     }
 
     public function GetDirection(){ return mDir;}
