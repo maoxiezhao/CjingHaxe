@@ -5,6 +5,7 @@ import game.entity.Entity;
 enum ComponentType
 {
     ComponentType_Movement;
+    ComponentType_BoundingBox;
 }
 
 class Component
@@ -30,8 +31,11 @@ class Component
     {
         mCurrentEntity = entity;
         mManager = componentManager;
+
+        AddedImpl();
     }
 
+    public function AddedImpl() {}
     public function Update(dt:Float){}
     public function Dispose(){}
 }

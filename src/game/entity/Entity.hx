@@ -9,7 +9,7 @@ import helper.Animation;
 import helper.AnimationSprite;
 import helper.AnimationOptionLoader;
 import helper.AnimationManager;
-
+import helper.CoolDownTimer;
 
 // base entity class
 // TODO: 1.add paused status 
@@ -23,6 +23,7 @@ class Entity
 
     public var mBaseObject:Object;
     public var mCurrentMap:GameMap;
+    public var mCoolDownTimer:CoolDownTimer;
 
     // TODO: will refactor component
     private var mComponents:ComponentManager;
@@ -42,12 +43,32 @@ class Entity
 
         mComponents = new ComponentManager(this);
 
+        mCoolDownTimer = new CoolDownTimer();
+
         mAnimationManager = new AnimationManager();
         mAnimations = new Array();
     }
 
+    public function Dispose()
+    {
+        mComponents.Dispose();
+        
+        for (animation in mAnimations)
+        {
+            animation.Dispose();
+        }
+        mAnimations = null;
+
+        mCoolDownTimer.Dispose();
+
+        mCurrentMap = null;
+        mBaseObject = null;
+    }
+
     public function Update(dt:Float)
     {
+        mCoolDownTimer.Update(dt);
+        
         mComponents.Update(dt);
 
         for (animation in mAnimations) {
@@ -67,24 +88,11 @@ class Entity
         mPos.y = y;
         mBaseObject.setPosition(x, y);
     }
+    public function GetPosition() { return mPos; }
 
     public function SetCurrentMap(map:GameMap)
     {
         mCurrentMap = map;
-    }
-
-    public function Dispose()
-    {
-        mComponents.Dispose();
-        
-        for (animation in mAnimations)
-        {
-            animation.Dispose();
-        }
-        mAnimations = null;
-
-        mCurrentMap = null;
-        mBaseObject = null;
     }
 
     public function SetLayer(layer:Int)
@@ -133,8 +141,5 @@ class Entity
         }
     }
 
-    public function NotifyGameCommand(commandEvent:GameCommandEvent)
-    {
-        
-    }
+    public function NotifyGameCommand(commandEvent:GameCommandEvent) {}
 }
