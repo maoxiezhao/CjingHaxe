@@ -4,6 +4,8 @@ import h2d.Object;
 import helper.Animation;
 import game.entity.Entity;
 
+// TODO:refacto animation 
+// 目前保存了所有的Animation,只在BaseObject中添加当前正在播放的player，如果停止则从baseObject中移除
 class AnimationSprite
 {
     public var mAnimationMap:Map<String, Animation>;
@@ -61,6 +63,7 @@ class AnimationSprite
         if (mCurrentAnimation != null)
         {
             mCurrentAnimation.Stop();
+            mCurrentAnimation.mAnimPlayer.remove();
             mCurrentAnimation = null;
         }
     }

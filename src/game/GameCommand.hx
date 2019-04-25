@@ -39,6 +39,17 @@ class GameCommandManager
         mInputGameCommandMapping.set(key, command);
     }
 
+    public function IsCommandPressed(command:GameCommand)
+    {
+        for(currCommand in mPressedGameCommands)
+        {
+            if (currCommand == command) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function CheckInput()
     {
         for (key => command in mInputGameCommandMapping)

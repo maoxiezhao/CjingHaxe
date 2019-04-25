@@ -12,11 +12,11 @@
   {
     "name" : "walking",
     "src_image" : "player.png",
-    "frame_delay" : 150,
+    "frame_delay" : 100,
     "frame_loop" : 1,
     "directions" : [
-      { "x" : 0, "y" : 32,  "width" : 32, "height" : 32, "numFrames" : 4},
-      { "x" : 0, "y" : 192,  "width" : 32, "height" : 32, "numFrames" : 4}
+      { "x" : 0, "y" : 32,  "width" : 32, "height" : 32, "numFrames" : 3},
+      { "x" : 0, "y" : 192,  "width" : 32, "height" : 32, "numFrames" : 3}
     ]
   }
 ]

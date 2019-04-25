@@ -1,5 +1,6 @@
 package game.entity;
 
+import hxd.Timer;
 import helper.AnimationSprite;
 import hxd.Key;
 import hxd.res.Image;
@@ -34,6 +35,26 @@ class Hero extends Entity
     {
         super.Update(dt);
         
+        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
+        var gameCommands = GetGameCommmands();
+        if (gameCommands != null)
+        {
+            if (gameCommands.IsCommandPressed(GameCommand_Right)) 
+            {
+                GetAnimationManger().RequestState("walking");
+                movement.SetSpeed(60, 0);
+            }
+            else if (gameCommands.IsCommandPressed(GameCommand_Left)) 
+            {
+                GetAnimationManger().RequestState("walking");
+                movement.SetSpeed(-60, 0);
+            }
+            else 
+            {
+                GetAnimationManger().RequestState("idle");
+                movement.SetSpeed(0, 0);
+            }
+        }
     }
 
     override function NotifyGameCommand(commandEvent:GameCommandEvent)
@@ -47,6 +68,20 @@ class Hero extends Entity
         {
             dir = Direction_Left;
         }
+
         SetDirection(dir);
+    }
+    
+    // TODO
+    public function GetGameCommmands()
+    {
+        if (mCurrentMap != null)
+        {
+            var currentGame = mCurrentMap.mCurrentGame;
+            if (currentGame != null) {
+                return currentGame.mGameCommandManager;
+            }
+        }
+        return null;
     }
 }
