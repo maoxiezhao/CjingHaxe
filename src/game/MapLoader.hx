@@ -31,6 +31,11 @@ typedef MapData = {
 // 2. support animation tile
 class MapLoader
 {
+    public var mMapWidth:Int;
+    public var mMapHeight:Int;
+    public var mMapTileWidth:Int;
+    public var mMapTileHeight:Int;
+
     public function new() {}
     
     public function LoadMap(path:String, map:GameMap)
@@ -44,13 +49,15 @@ class MapLoader
         var mapJsonText = hxd.Res.loader.load(jsonPath);
         var mapData:MapData = Json.parse(mapJsonText.toText());
 
-        var tileWidth:Int = mapData.tilewidth;
-        var tileHeight:Int = mapData.tileheight;
-        var mapWidth:Int = mapData.width;
-        var mapHeight:Int = mapData.height;
+        mMapTileWidth = mapData.tilewidth;
+        mMapTileHeight = mapData.tileheight;
+        mMapWidth = mapData.width;
+        mMapHeight = mapData.height;
 
-        map.mMapWidth = mapWidth * tileWidth;
-        map.mMapHeight = mapHeight * tileHeight;
+        map.mMapTileColNumber = mMapWidth;
+        map.mMapTileRowNumber = mMapHeight;
+        map.mMapWidth = mMapWidth * mMapTileWidth;
+        map.mMapHeight = mMapHeight * mMapTileHeight;
 
         // load map tileset
         // only support firset tileset now.
@@ -66,37 +73,11 @@ class MapLoader
             return;
         }
 
-        var tileImage = tileset.mSrcImage;
-        var tiles = tileset.mTiles;
-
         for(property in mapData.properties) {
             ProcessMapProperty(property, map);
         }
 
-        var layerIndex = 0;
-        for(layer in mapData.layers)
-        {
-            if (layerIndex >= GameMap.mMaxLayers) {
-                return; 
-            }
-
-            var group = new h2d.TileGroup(tileImage);
-            for(y in 0 ... mapWidth) {
-                for (x in 0 ... mapWidth) {
-                    var tid = layer.data[x + y * mapWidth];
-                    if (tid != 0) { 
-                        group.add(x * tileWidth, y * tileHeight, tiles[tid - 1].mTile);
-                    }
-                }
-            }
-
-            var layer:h2d.Layers = map.GetLayerByIndex(layerIndex);
-            if (layer != null) {
-                layer.addChild(group);
-            }
-
-            layerIndex++;
-        }
+        ProcessMapGround(mapData, tileset, map);
     }
 
     public function ProcessMapProperty(property:MapDataProperty, map:GameMap)
@@ -112,6 +93,51 @@ class MapLoader
             var image = hxd.Res.loader.load(imgPath).toImage();
             var bitmap:h2d.Bitmap = new h2d.Bitmap(image.toTile());
             map.SetCurrentBackground(bitmap);
+        }
+    }
+
+    public function ProcessMapGround(mapData:MapData, tileset:MapTileSet, map:GameMap)
+    {
+        var tileImage = tileset.mSrcImage;
+        var tiles = tileset.mTiles;
+        var mapSize = mMapWidth * mMapHeight;
+
+        var layerIndex = 0;
+        for(layer in mapData.layers)
+        {
+            if (layerIndex >= GameMap.mMaxLayers) {
+                return; 
+            }
+
+            var mapGround = map.mLayerGrounds[layerIndex];
+            mapGround.resize(mapSize);
+            for (index in 0...mapSize)
+            {
+                mapGround[index] = GROUND_EMPTY;
+            }
+
+            var group = new h2d.TileGroup(tileImage);
+            for(y in 0 ... mMapHeight) {
+                for (x in 0 ... mMapWidth) {
+                    var index = x + y * mMapWidth;
+                    var tid = layer.data[index];
+                    if (tid != 0) { 
+                        var tile = tiles[tid - 1];
+                        group.add(x * mMapTileWidth, y * mMapTileHeight, tile.mTile);
+
+                        if (tile.mIsObstacle == true) {
+                            mapGround[index] = GROUND_WALL;
+                        }
+                    }
+                }
+            }
+
+            var layer:h2d.Layers = map.GetLayerByIndex(layerIndex);
+            if (layer != null) {
+                layer.addChild(group);
+            }
+
+            layerIndex++;
         }
     }
 }

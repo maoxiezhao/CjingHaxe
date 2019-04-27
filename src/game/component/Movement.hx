@@ -4,7 +4,7 @@ import h2d.col.Point;
 import h3d.mat.Data.Face;
 import game.Component;
 import game.entity.Entity;
-
+import game.component.BoundingBox;
 import helper.System;
 
 // base movement component
@@ -19,7 +19,7 @@ class Movement extends Component
     
     private var mNextMoveXTime:UInt = 0;
     private var mDurationX:UInt = 0;
-    private var mNextMoveYTIme:UInt = 0;
+    private var mNextMoveYTime:UInt = 0;
     private var mDurationY:UInt = 0;
 
     private var mPosition:Point;
@@ -38,14 +38,49 @@ class Movement extends Component
     {
         var now = System.Now();
         var moveX = mDirectionX != 0 && now >= mNextMoveXTime;
+        var moveY = mDirectionY != 0 && now >= mNextMoveYTime;
 
-        if (moveX == true)
+        while (moveX || moveY)
         {
-            if (CheckCollision(new Point(mDirectionX, 0)) == true)
+            UpdateXY(now, moveX, moveY);
+
+            moveX = mDirectionX != 0 && now >= mNextMoveXTime;
+            moveY = mDirectionY != 0 && now >= mNextMoveYTime;
+        }
+    }
+
+    public function UpdateXY(now:UInt, moveX:Bool, moveY:Bool)
+    {
+        var oldPos = mPosition;
+
+        if (moveX)
+        {
+            if (moveY)
             {
-                Translate(new Point(mDirectionX, 0));
+                if (CheckCollision(new Point(mDirectionX, mDirectionY)) == true) {
+                    Translate(new Point(mDirectionX, mDirectionY));
+                }
+                mNextMoveXTime = mNextMoveXTime + mDurationX;
+                mNextMoveYTime = mNextMoveYTime + mDurationY;
             }
-            mNextMoveXTime = now + mDurationX;
+            else 
+            {
+                if (CheckCollision(new Point(mDirectionX, 0)) == true) {
+                    Translate(new Point(mDirectionX, 0));
+                }
+                mNextMoveXTime = mNextMoveXTime + mDurationX;
+            }
+        }
+        else 
+        {
+            if (CheckCollision(new Point(0, mDirectionY)) == true) {
+                Translate(new Point(0, mDirectionY));
+            }
+            mNextMoveYTime = mNextMoveYTime + mDurationY;
+        }
+
+        if ((moveX || moveY) && oldPos == mPosition) {
+            mCurrentEntity.NotifyEntityEvent(EntityEvent_ObstacleReached);
         }
     }
 
@@ -95,11 +130,55 @@ class Movement extends Component
 
     public function SetSpeedY(speed:Float)
     {
+      if (Math.abs(mSpeedY - speed) < 1e-5) {
+            return;
+        }
+        if (Math.abs(speed) < 1e-5) {
+            speed = 0;
+        }
 
+        mSpeedY = speed;
+
+        if (speed == 0)
+        {
+            mDurationY = 0;
+            mDirectionY = 0;
+        }
+        else 
+        {
+            if (speed > 0)
+            {
+                mDurationY = Math.floor(1000.0 / speed);
+                mDirectionY = 1;
+            }
+            else 
+            {
+                mDurationY = Math.floor(1000.0 / -speed);
+                mDirectionY = -1;
+            }
+
+            mNextMoveYTime = System.Now() + mDurationY;
+        }
     }
 
-    public function CheckCollision(position:Point):Bool
+    // TODO: optimize
+    public function CheckCollision(offset:Point):Bool
     {
+        var currentMap = mCurrentEntity.GetCurrentMap();
+        if (currentMap != null)
+        {
+            var boundingBoxs = mCurrentEntity.GetComponents().GetComponentsByType(ComponentType_BoundingBox);
+            if (boundingBoxs.length > 0)
+            {
+                var boundingBox:BoundingBox = cast(boundingBoxs[0], BoundingBox);
+                var bound = boundingBox.mBound.clone();
+                bound.x += offset.x;
+                bound.y += offset.y;
+
+                return currentMap.CheckCollision(bound, offset, mCurrentEntity);
+            }
+        }
+
         return true;
     }
 

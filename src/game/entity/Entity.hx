@@ -24,6 +24,7 @@ class Entity
     public var mBaseObject:Object;
     public var mCurrentMap:GameMap;
     public var mCoolDownTimer:CoolDownTimer;
+    public var mEventManagement:EventManagement;
 
     // TODO: will refactor component
     private var mComponents:ComponentManager;
@@ -44,7 +45,7 @@ class Entity
         mComponents = new ComponentManager(this);
 
         mCoolDownTimer = new CoolDownTimer();
-
+        mEventManagement = new EventManagement();
         mAnimationManager = new AnimationManager();
         mAnimations = new Array();
     }
@@ -95,6 +96,11 @@ class Entity
         mCurrentMap = map;
     }
 
+    public function GetCurrentMap()
+    {
+        return mCurrentMap;
+    }
+
     public function SetLayer(layer:Int)
     {
         mLayer = layer;
@@ -142,4 +148,14 @@ class Entity
     }
 
     public function NotifyGameCommand(commandEvent:GameCommandEvent) {}
+
+    public function RegisterEntityEventCallback(event:EntityEvent, callback:Void->Void)
+    {
+        mEventManagement.Add(event, callback);
+    }
+
+    public function NotifyEntityEvent(event:EntityEvent)
+    {
+        mEventManagement.NotifyEvent(event);
+    }
 }

@@ -8,6 +8,7 @@ import hxd.Res;
 import helper.Animation.AnimationOption;
 import game.animationStates.NormalEntity;
 import game.GameCommand;
+import game.component.BoundingBox;
 import game.component.Movement;
 
 class Hero extends Entity
@@ -29,6 +30,7 @@ class Hero extends Entity
 
         var components = GetComponents();
         components.Add(new Movement("PlayerMove"));
+        components.Add(new BoundingBox("BoundingBox", 0, 0, 32, 32));
     }
 
     override function Update(dt:Float)
@@ -42,17 +44,17 @@ class Hero extends Entity
             if (gameCommands.IsCommandPressed(GameCommand_Right)) 
             {
                 GetAnimationManger().RequestState("walking");
-                movement.SetSpeed(60, 0);
+                movement.SetSpeedX(200);
             }
             else if (gameCommands.IsCommandPressed(GameCommand_Left)) 
             {
                 GetAnimationManger().RequestState("walking");
-                movement.SetSpeed(-60, 0);
+                movement.SetSpeedX(-200);
             }
             else 
             {
                 GetAnimationManger().RequestState("idle");
-                movement.SetSpeed(0, 0);
+                movement.SetSpeed(0, 50);
             }
         }
     }

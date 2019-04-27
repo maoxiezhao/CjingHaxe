@@ -4,9 +4,19 @@ import game.GameCommand;
 import game.entity.Camera;
 import game.entity.Entity;
 import h2d.Bitmap;
+import h2d.col.Point;
+import Std;
+
+enum MapGround
+{
+    GROUND_EMPTY;
+    GROUND_WALL;
+}
 
 // 地图类，地图类管理所有的Entity，同时负责关卡的加载与切换
-// NOTE：目前Hero由Map管理，未来希望将Hero的管理交由Game
+// TODO：
+// 1.目前Hero由Map管理，未来希望将Hero的管理交由Game
+// 2.entities class
 class GameMap 
 {
     public var mCurrentGame:Game;
@@ -16,13 +26,20 @@ class GameMap
     public var mEntities:Array<Entity>;
     public var mNameEntitiesMap:Map<String, Entity>;
 
+    // TODO
+    public var mLayerGrounds:Array<Array<MapGround>>;
+
     public var mMapName:String = "";
     public var mMapWidth:Int;
     public var mMapHeight:Int;
+    public var mMapTileRowNumber:Int;
+    public var mMapTileColNumber:Int;
 
     public var mBackground:h2d.Bitmap = null;
 
     public static var mMaxLayers :Int = 3;
+    public static var mCellGroundWidth:Int = 32;
+    public static var mCellGroundHeight:Int = 32;
 
     // 目前提供3个层级
     public var mCurrentLayers:Array<h2d.Layers>;
@@ -34,6 +51,8 @@ class GameMap
         mNameEntitiesMap = new Map();
         mCamera = new Camera();
 
+        mLayerGrounds = new Array();
+
         // layer 1..3 zpos  is 3 .. 1
         // backgound zpos is 0
         mCurrentLayers = new Array();
@@ -42,6 +61,9 @@ class GameMap
             var layer = new h2d.Layers();
             mCurrentLayers.push(layer);
             currentGame.mRootLayer.add(layer, mMaxLayers - index); 
+
+            var grounds:Array<MapGround> = new Array();
+            mLayerGrounds.push(grounds);
         }
     }
 
@@ -144,13 +166,53 @@ class GameMap
         }
     }
 
-    public function CheckCollision()
-    {
-        return true;     
-    }
-
     public function NotifyGameCommand(commandEvent:GameCommandEvent)
     {
       
+    }
+
+    public function GetGround(layer:Int, x:Int, y:Int):MapGround
+    {
+        var grounds = mLayerGrounds[layer];
+        var index = Std.int(y / mCellGroundHeight) * mMapTileColNumber + Std.int(x / mCellGroundWidth);
+        return grounds[index];
+    }
+
+    //**********************************************************************/
+    // Check Collision
+    //**********************************************************************/
+
+    // 先强行检测四个点（四个角），在xy方向上各一次
+    // TODO: 实现一个碰撞检测类，能够生成碰撞点和检测规则，以满足不同情况
+    public function CheckCollision(bound:h2d.col.Bounds, offset:Point, entity:Entity)
+    {
+        var xBegin = Std.int(bound.x);
+        var xEnd   = Std.int(xBegin + bound.width - 1);
+        var yBegin = Std.int(bound.y);
+        var yEnd   = Std.int(yBegin + bound.height - 1);
+
+        var layer = entity.GetLayer();
+		if (CheckCollisionWithGround(layer, xBegin, yBegin) ||
+			CheckCollisionWithGround(layer, xBegin, yEnd) ||
+			CheckCollisionWithGround(layer, xEnd,   yBegin) ||
+			CheckCollisionWithGround(layer, xEnd,   yEnd)){
+			return true;
+		}
+
+        return false;     
+    }
+
+    // 与简单的ground检查碰撞，基于16x16的网格
+    public function CheckCollisionWithGround(layer:Int, x:Int, y:Int)
+    {
+        var ground = GetGround(layer, x, y);
+        var canMove = false;
+        switch (ground) {
+            case GROUND_EMPTY:
+                canMove = true;
+            case GROUND_WALL:
+                canMove = false;
+        }
+        return canMove;
     }
 }
