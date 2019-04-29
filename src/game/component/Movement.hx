@@ -23,6 +23,7 @@ class Movement extends Component
     private var mDurationY:UInt = 0;
 
     private var mPosition:Point;
+    private var mUpdateSmooth:Bool = false;
 
     public function new(name:String)
     {
@@ -42,8 +43,13 @@ class Movement extends Component
 
         while (moveX || moveY)
         {
-            UpdateXY(now, moveX, moveY);
-
+            if (mUpdateSmooth == true) {
+                UpdateXYSmooth(now, moveX, moveY);
+            }
+            else {
+                UpdateXY(now, moveX, moveY);
+            }
+            
             moveX = mDirectionX != 0 && now >= mNextMoveXTime;
             moveY = mDirectionY != 0 && now >= mNextMoveYTime;
         }
@@ -51,8 +57,7 @@ class Movement extends Component
 
     public function UpdateXY(now:UInt, moveX:Bool, moveY:Bool)
     {
-        var oldPos = mPosition;
-
+        var oldPos = mPosition.clone();
         if (moveX)
         {
             if (moveY)
@@ -80,8 +85,72 @@ class Movement extends Component
         }
 
         if ((moveX || moveY) && oldPos == mPosition) {
-            mCurrentEntity.NotifyEntityEvent(EntityEvent_ObstacleReached);
+            NotifyReachedObstacle(moveX, moveY, 
+                new Point(mPosition.x - oldPos.x, mPosition.y - oldPos.y));
         }
+    }
+
+    public function UpdateXYSmooth(now:UInt, moveX:Bool, moveY:Bool)
+    {
+        var oldPos = mPosition.clone();
+        if (moveX)
+        {
+            if (moveY)
+            {
+                if (mNextMoveXTime <= mNextMoveYTime) 
+                {
+                    UpdateXSmooth();
+                    if (now >= mNextMoveYTime) {
+                        UpdateYSmooth();
+                    }
+                }
+                else 
+                {
+                    UpdateYSmooth();
+                    if (now >= mNextMoveXTime) {
+                        UpdateXSmooth();
+                    }
+                }
+            }
+            else 
+            {
+                UpdateXSmooth();
+            }
+        }
+        else 
+        {
+            UpdateYSmooth();
+        }
+
+        if ((moveX || moveY) && oldPos == mPosition) {
+            NotifyReachedObstacle(moveX, moveY, 
+                new Point(mPosition.x - oldPos.x, mPosition.y - oldPos.y));
+        }
+    }
+
+    private function UpdateXSmooth()
+    {
+        if (mDirectionX != 0)
+        {
+
+            if (CheckCollision(new Point(mDirectionX, 0)) == true) {
+                Translate(new Point(mDirectionX, 0));
+            }
+            else 
+            {
+                // can't move x, try give a y offset
+                if (mDirectionY == 0)
+                {
+                    
+                } 
+            }
+            mNextMoveXTime = mNextMoveXTime + mDurationX;
+        }
+    }
+
+    private function UpdateYSmooth()
+    {
+
     }
 
     override public function Dispose()
@@ -196,5 +265,10 @@ class Movement extends Component
             mCurrentEntity.SetPosition(pos.x, pos.y);
         }
         mPosition = pos;
+    }
+
+    public function NotifyReachedObstacle(moveX:Bool, moveY:Bool, offset:Point)
+    {
+        mCurrentEntity.NotifyEntityEvent(EntityEvent_ObstacleReached);
     }
 }
