@@ -88,6 +88,8 @@ class Entity
         mPos.x = x;
         mPos.y = y;
         mBaseObject.setPosition(x, y);
+
+        NotifyEntityEvent(EntityEvent_ObstacleReached);
     }
     public function GetPosition() { return mPos; }
 

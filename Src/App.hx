@@ -1,5 +1,6 @@
 package;
 
+import hxd.Window;
 import h3d.impl.MacroHelper;
 import hxd.App;
 import game.Game;

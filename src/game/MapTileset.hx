@@ -2,6 +2,7 @@ package game;
 
 import haxe.Json;
 import game.MapLoader;
+import helper.Log;
 
 // TODO: extend entity??
 class MapTile
@@ -57,7 +58,7 @@ class MapTileSet
         var imgPath:String = "map/tileset/" + mapTilesetData.image;
         var isImgExists = hxd.Res.loader.exists(imgPath);
         if (isImgExists == false) {
-            trace("The tileset src img'" + imgPath + "' is not found.");
+            Logger.Error("The tileset src img'" + imgPath + "' is not found.");
             return;
         }
         mSrcImage = hxd.Res.loader.load(imgPath).toTile();

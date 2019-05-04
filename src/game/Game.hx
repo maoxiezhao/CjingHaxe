@@ -22,6 +22,8 @@ class Game
      
         mRootLayer = new h2d.Layers(mCurrentApp.s2d);   
         mCurrentMap = new GameMap(this);
+        mCurrentMap.mDebugObstacleEnable = false;
+
         mHero = new Hero();
 
         mGameCommandManager = new GameCommandManager(this);

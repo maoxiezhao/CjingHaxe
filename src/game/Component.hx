@@ -23,6 +23,7 @@ class Component
 
     public function Clear()
     {
+        RemovedImpl(); 
         mCurrentEntity = null;
         mManager = null;
     }
@@ -31,11 +32,12 @@ class Component
     {
         mCurrentEntity = entity;
         mManager = componentManager;
-
         AddedImpl();
     }
 
-    public function AddedImpl() {}
+    private function RemovedImpl() {}
+    private function AddedImpl() {}
+    
     public function Update(dt:Float){}
     public function Dispose(){}
 }

@@ -18,5 +18,25 @@
       { "x" : 0, "y" : 32,  "width" : 32, "height" : 32, "numFrames" : 3},
       { "x" : 0, "y" : 192,  "width" : 32, "height" : 32, "numFrames" : 3}
     ]
+  },
+  {
+    "name" : "startjumping",
+    "src_image" : "player.png",
+    "frame_delay" : 100,
+    "frame_loop" : 1,
+    "directions" : [
+      { "x" : 0, "y" : 64,  "width" : 32, "height" : 32, "numFrames" : 1},
+      { "x" : 96, "y" : 224,  "width" : 32, "height" : 32, "numFrames" : 1}
+    ]
+  },
+  {
+    "name" : "endjumping",
+    "src_image" : "player.png",
+    "frame_delay" : 100,
+    "frame_loop" : 1,
+    "directions" : [
+      { "x" : 32, "y" : 64,  "width" : 32, "height" : 32, "numFrames" : 1},
+      { "x" : 64, "y" : 224,  "width" : 32, "height" : 32, "numFrames" : 1}
+    ]
   }
 ]

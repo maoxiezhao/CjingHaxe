@@ -3,6 +3,7 @@ package game;
 import game.GameCommand;
 import game.entity.Camera;
 import game.entity.Entity;
+import helper.Log;
 import h2d.Bitmap;
 import h2d.col.Point;
 import Std;
@@ -28,6 +29,8 @@ class GameMap
 
     // TODO
     public var mLayerGrounds:Array<Array<MapGround>>;
+    public var mDebugObstacleEnable:Bool = false;
+    public var mDebugDrawable:h2d.Graphics;
 
     public var mMapName:String = "";
     public var mMapWidth:Int;
@@ -52,6 +55,9 @@ class GameMap
         mCamera = new Camera();
 
         mLayerGrounds = new Array();
+
+        mDebugDrawable = new h2d.Graphics();
+        currentGame.mRootLayer.add(mDebugDrawable, 10);
 
         // layer 1..3 zpos  is 3 .. 1
         // backgound zpos is 0
@@ -85,7 +91,7 @@ class GameMap
         var layer:h2d.Layers = GetLayerByIndex(layerIndex);
         if (layer == null)
         {
-            trace("The Adding Entity named" + name + 
+            Logger.Waring("The Adding Entity named" + name + 
                 " has an invalid layer:" + layer);
             return;
         }
@@ -95,7 +101,7 @@ class GameMap
         {
             if (mNameEntitiesMap.exists(name)) {
                 // TODO:instead of log
-                trace("The Adding Entity named" + name + 
+                Logger.Waring("The Adding Entity named" + name + 
                     " has already exists and replace older.");
             }
             mNameEntitiesMap.set(name, entity);
@@ -110,7 +116,7 @@ class GameMap
     {
         if (index < 0 || index >= 3)
         {
-            trace("Invalid index");
+            Logger.Error("Invalid index");
             return null;
         }
         return mCurrentLayers[index];
@@ -134,6 +140,25 @@ class GameMap
 
         for(entity in mEntities) {
             entity.Update(dt);
+        }
+        
+        if (mDebugObstacleEnable)
+        {
+            mDebugDrawable.clear();
+            mDebugDrawable.beginFill(0xFFFFFF);
+            var grounds = mLayerGrounds[1];
+
+            var index = 0;
+            for (ground in grounds)
+            {
+                if (ground == GROUND_WALL)
+                    mDebugDrawable.drawRect(
+                        index % mMapTileColNumber * mCellGroundWidth, 
+                        Math.floor(index / mMapTileColNumber) * mCellGroundHeight, 
+                        mCellGroundWidth, mCellGroundHeight);
+
+                index++;
+            }
         }
     }
 
@@ -174,7 +199,7 @@ class GameMap
     public function GetGround(layer:Int, x:Int, y:Int):MapGround
     {
         var grounds = mLayerGrounds[layer];
-        var index = Std.int(y / mCellGroundHeight) * mMapTileColNumber + Std.int(x / mCellGroundWidth);
+        var index = Math.floor(y / mCellGroundHeight) * mMapTileColNumber + Math.floor(x / mCellGroundWidth);
         return grounds[index];
     }
 
@@ -187,32 +212,32 @@ class GameMap
     public function CheckCollision(bound:h2d.col.Bounds, offset:Point, entity:Entity)
     {
         var xBegin = Std.int(bound.x);
-        var xEnd   = Std.int(xBegin + bound.width - 1);
+        var xEnd   = Std.int(xBegin + bound.width);
         var yBegin = Std.int(bound.y);
-        var yEnd   = Std.int(yBegin + bound.height - 1);
+        var yEnd   = Std.int(yBegin + bound.height);
 
         var layer = entity.GetLayer();
-		if (CheckCollisionWithGround(layer, xBegin, yBegin) ||
-			CheckCollisionWithGround(layer, xBegin, yEnd) ||
-			CheckCollisionWithGround(layer, xEnd,   yBegin) ||
-			CheckCollisionWithGround(layer, xEnd,   yEnd)){
-			return true;
-		}
+        if (CheckCollisionWithGround(layer, xBegin, yBegin) ||
+            CheckCollisionWithGround(layer, xBegin, yEnd) ||
+            CheckCollisionWithGround(layer, xEnd,   yBegin) ||
+            CheckCollisionWithGround(layer, xEnd,   yEnd)){
+            return true;
+        }
 
         return false;     
     }
 
-    // 与简单的ground检查碰撞，基于16x16的网格
+    // 与简单的ground检查碰撞，基于32x32的网格
     public function CheckCollisionWithGround(layer:Int, x:Int, y:Int)
     {
         var ground = GetGround(layer, x, y);
-        var canMove = false;
+        var cantMove = false;
         switch (ground) {
             case GROUND_EMPTY:
-                canMove = true;
+                cantMove = false;
             case GROUND_WALL:
-                canMove = false;
+                cantMove = true;
         }
-        return canMove;
+        return cantMove;
     }
 }

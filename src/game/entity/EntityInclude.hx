@@ -34,6 +34,22 @@ class EventManagement
         callbacks.push(callback);
     }
 
+    public function Remove(event:EntityEvent, ?callback:Void->Void)
+    {
+        var callbacks = mEventCallBacks.get(event);
+        if (callbacks != null)
+        {
+            if (callback != null)
+            {
+                callbacks.remove(callback);
+            }
+            else 
+            {
+                mEventCallBacks.remove(event);
+            }
+        }
+    }
+
     public function NotifyEvent(event:EntityEvent)
     {
         var callbacks = mEventCallBacks.get(event);

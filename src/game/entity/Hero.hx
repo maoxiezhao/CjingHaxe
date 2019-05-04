@@ -10,6 +10,7 @@ import game.animationStates.NormalEntity;
 import game.GameCommand;
 import game.component.BoundingBox;
 import game.component.Movement;
+import game.component.AccelMovement;
 
 class Hero extends Entity
 {
@@ -24,13 +25,21 @@ class Hero extends Entity
         SetPosition(600, 200);
 
         var animationManger = GetAnimationManger();
-        var idelState = NormalEntity.CreateIdelState(this);
-        animationManger.AddState("idle", mBody, idelState);
-        animationManger.AddState("walking", mBody);
+        animationManger.AddState("idle", mBody, NormalEntity.CreateIdelState(this));
+        animationManger.AddState("walking", mBody, NormalEntity.CreateWalkingState(this));
+        animationManger.AddState("startjumping", mBody, NormalEntity.CreateStartJumpingState(this));
+        animationManger.AddState("endjumping", mBody, NormalEntity.CreateEndJumpingState(this));
+        animationManger.RequestState("idle");
 
         var components = GetComponents();
-        components.Add(new Movement("PlayerMove"));
-        components.Add(new BoundingBox("BoundingBox", 0, 0, 32, 32));
+        var movement = new AccelMovement("PlayerMove");
+        movement.SetGravityEnable(true);
+        movement.SetUpdateSmooth(true);
+        components.Add(movement);
+
+        var boundingBox = new BoundingBox("BoundingBox", 6, 0, 20, 32);
+        boundingBox.SetDebugEnable(false);
+        components.Add(boundingBox);
     }
 
     override function Update(dt:Float)
@@ -43,18 +52,15 @@ class Hero extends Entity
         {
             if (gameCommands.IsCommandPressed(GameCommand_Right)) 
             {
-                GetAnimationManger().RequestState("walking");
                 movement.SetSpeedX(200);
             }
             else if (gameCommands.IsCommandPressed(GameCommand_Left)) 
             {
-                GetAnimationManger().RequestState("walking");
                 movement.SetSpeedX(-200);
             }
             else 
             {
-                GetAnimationManger().RequestState("idle");
-                movement.SetSpeed(0, 50);
+                movement.SetSpeedX(0);
             }
         }
     }
@@ -70,8 +76,12 @@ class Hero extends Entity
         {
             dir = Direction_Left;
         }
-
         SetDirection(dir);
+
+        if (commandEvent.command == GameCommand_Jump && commandEvent.isPressed)
+        {
+            TryJumping();
+        }
     }
     
     // TODO
@@ -85,5 +95,13 @@ class Hero extends Entity
             }
         }
         return null;
+    }
+
+    public function TryJumping()
+    {
+        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
+        if (movement.IsOnFloor()) {
+            movement.SetSpeedY(-250);
+        }
     }
 }
