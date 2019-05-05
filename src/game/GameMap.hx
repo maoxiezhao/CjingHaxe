@@ -16,6 +16,7 @@ enum MapGround
 
 // 地图类，地图类管理所有的Entity，同时负责关卡的加载与切换
 // TODO：
+// 0.public -> private
 // 1.目前Hero由Map管理，未来希望将Hero的管理交由Game
 // 2.entities class
 class GameMap 
@@ -27,10 +28,11 @@ class GameMap
     public var mEntities:Array<Entity>;
     public var mNameEntitiesMap:Map<String, Entity>;
 
-    // TODO
+    // TODO Begin
     public var mLayerGrounds:Array<Array<MapGround>>;
     public var mDebugObstacleEnable:Bool = false;
     public var mDebugDrawable:h2d.Graphics;
+    // TODO End
 
     public var mMapName:String = "";
     public var mMapWidth:Int;
@@ -45,6 +47,7 @@ class GameMap
     public static var mCellGroundHeight:Int = 32;
 
     // 目前提供3个层级
+    public var mScroller:h2d.Layers;
     public var mCurrentLayers:Array<h2d.Layers>;
 
     public function new(currentGame:Game)
@@ -59,6 +62,9 @@ class GameMap
         mDebugDrawable = new h2d.Graphics();
         currentGame.mRootLayer.add(mDebugDrawable, 10);
 
+        mScroller = new h2d.Layers();
+        currentGame.mRootLayer.add(mScroller, 9);
+
         // layer 1..3 zpos  is 3 .. 1
         // backgound zpos is 0
         mCurrentLayers = new Array();
@@ -66,11 +72,31 @@ class GameMap
         {
             var layer = new h2d.Layers();
             mCurrentLayers.push(layer);
-            currentGame.mRootLayer.add(layer, mMaxLayers - index); 
+            mScroller.add(layer, mMaxLayers - index); 
 
             var grounds:Array<MapGround> = new Array();
             mLayerGrounds.push(grounds);
         }
+    }
+
+    public function Dispose()
+    {
+        for(entity in mEntities) {
+            entity.Dispose();
+        }
+        mEntities = null;
+        
+        for(layer in mCurrentLayers) {
+            layer.removeChildren();
+            layer.remove();
+        }
+        mCurrentLayers = null;
+
+        mScroller.removeChildren();
+        mScroller.remove();
+
+        mCurrentGame = null;
+        mCamera = null;   
     }
 
     public function LoadMap(path:String)
@@ -107,6 +133,12 @@ class GameMap
             mNameEntitiesMap.set(name, entity);
         }
         mEntities.push(entity);
+
+        // tracing hero
+        if (entity.GetEntityType() == EntityType_Hero) 
+        {
+            mCamera.TraceTarget(entity);
+        }
 
         entity.SetLayer(layerIndex);
         entity.SetCurrentMap(this);
@@ -160,22 +192,6 @@ class GameMap
                 index++;
             }
         }
-    }
-
-    public function Dispose()
-    {
-        for(entity in mEntities) {
-            entity.Dispose();
-        }
-        mEntities = null;
-        
-        for(layer in mCurrentLayers) {
-            layer.removeChildren();
-        }
-        mCurrentLayers = null;
-
-        mCurrentGame = null;
-        mCamera = null;   
     }
 
     public function SetCurrentBackground(background:h2d.Bitmap)

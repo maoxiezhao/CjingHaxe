@@ -101,7 +101,7 @@ class Hero extends Entity
     {
         var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
         if (movement.IsOnFloor()) {
-            movement.SetSpeedY(-250);
+            movement.SetSpeedY(-280);
         }
     }
 }

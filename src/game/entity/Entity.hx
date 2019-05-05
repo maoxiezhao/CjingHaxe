@@ -149,6 +149,11 @@ class Entity
         }
     }
 
+    public function GetEntityType() 
+    { 
+        return mEntityType; 
+    }
+
     public function NotifyGameCommand(commandEvent:GameCommandEvent) {}
 
     public function RegisterEntityEventCallback(event:EntityEvent, callback:Void->Void)

@@ -5,6 +5,7 @@ import haxe.Json;
 import hxd.Res.loader;
 import game.GameMap;
 import game.Assets;
+import helper.Log;
 
 typedef MapDataProperty = {
     name:String,
@@ -40,6 +41,8 @@ class MapLoader
     
     public function LoadMap(path:String, map:GameMap)
     {
+        Logger.Info("Loading Map: map/" + path + ".json");
+
         var jsonPath:String = "map/" + path + ".json";
         var isExists:Bool = hxd.Res.loader.exists(jsonPath);
         if (isExists == false) {

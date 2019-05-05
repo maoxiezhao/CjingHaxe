@@ -267,6 +267,12 @@ class Movement extends Component
         }
     }
 
+    // TODO
+    private function CheckIsOnFloor()
+    {
+
+    }
+
     // TODO: optimize
     public function CheckCollision(offset:Point):Bool
     {
@@ -290,9 +296,7 @@ class Movement extends Component
 
     public function Translate(offset:Point)
     {
-        if (offset.y != 0) {
-            mIsOnFloor = false;
-        }
+        NotifyPositionChanged();
 
         SetPosition(new Point(
             offset.x + mPosition.x,
@@ -311,7 +315,6 @@ class Movement extends Component
     public function NotifyReachedObstacle(moveX:Bool, moveY:Bool, directionX:Int, directionY:Int, offset:Point)
     {
         mCurrentEntity.NotifyEntityEvent(EntityEvent_ObstacleReached);
-
         if (moveY && offset.y == 0)
         {
             if (mDirectionY > 0) {
@@ -322,6 +325,11 @@ class Movement extends Component
         }
     }
     
+    public function NotifyPositionChanged()
+    {
+        mIsOnFloor = CheckCollision(new Point(0, 1));
+    }
+
     public function SetUpdateSmooth(smooth)
     {
         mUpdateSmooth = smooth;
