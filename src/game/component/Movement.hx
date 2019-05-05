@@ -1,5 +1,6 @@
 package game.component;
 
+import hxd.Math;
 import h2d.col.Point;
 import h3d.mat.Data.Face;
 import game.Component;
@@ -16,18 +17,13 @@ class Movement extends Component
     private var mSpeedY:Float = 0;
     private var mDirectionX:Int = 0;
     private var mDirectionY:Int = 0;
-    
-    private var mNextMoveXTime:UInt = 0;
-    private var mPrevMoveXTime:UInt = 0;
-    private var mDurationX:UInt = 0;
-
-    private var mNextMoveYTime:UInt = 0;
-    private var mPrevMoveYTime:UInt = 0;
-    private var mDurationY:UInt = 0;
+    private var mAccumulatedYSteps:Float = 0;
+    private var mAccumulatedXSteps:Float = 0;
 
     private var mPosition:Point;
     private var mUpdateSmooth:Bool = false;
-    private var mIsOnFloor:Bool = true;
+    private var mIsOnFloor:Bool = false;
+    private var mCheckOnFloorEnable:Bool = false;
 
     public function new(name:String)
     {
@@ -41,103 +37,14 @@ class Movement extends Component
 
     override public function Update(dt:Float)
     {
-        var now = System.Now();
-        var moveX = mDirectionX != 0 && now >= mNextMoveXTime;
-        var moveY = mDirectionY != 0 && now >= mNextMoveYTime;
-
-        while (moveX || moveY)
-        {
-            if (mUpdateSmooth == true) {
-                UpdateXYSmooth(now, moveX, moveY);
-            }
-            else {
-                UpdateXY(now, moveX, moveY);
-            }
-            
-            moveX = mDirectionX != 0 && now >= mNextMoveXTime;
-            moveY = mDirectionY != 0 && now >= mNextMoveYTime;
-        }
-    }
-
-    public function UpdateXY(now:UInt, moveX:Bool, moveY:Bool)
-    {
         var oldPos = mPosition.clone();
-        if (moveX)
-        {
-            if (moveY)
-            {
-                if (!CheckCollision(new Point(mDirectionX, mDirectionY)) == true) {
-                    Translate(new Point(mDirectionX, mDirectionY));
-                }
-                mPrevMoveXTime = mNextMoveXTime;
-                mNextMoveXTime = mNextMoveXTime + mDurationX;
+        var tryMovingX = UpdateXSmooth(dt);
+        var tryMovingY = UpdateYSmooth(dt);
 
-                mPrevMoveYTime = mNextMoveYTime;
-                mNextMoveYTime = mNextMoveYTime + mDurationY;
-            }
-            else 
-            {
-                if (!CheckCollision(new Point(mDirectionX, 0)) == true) {
-                    Translate(new Point(mDirectionX, 0));
-                }
-                mPrevMoveXTime = mNextMoveXTime;
-                mNextMoveXTime = mNextMoveXTime + mDurationX;
-            }
-        }
-        else 
+        var moveX = mDirectionX != 0 && tryMovingX;
+        var moveY = mDirectionY != 0 && tryMovingY;
+        if ((moveX || moveY) && oldPos.x == mPosition.x && oldPos.y == mPosition.y)
         {
-            if (!CheckCollision(new Point(0, mDirectionY)) == true) {
-                Translate(new Point(0, mDirectionY));
-            }
-        
-            mPrevMoveYTime = mNextMoveYTime;
-            mNextMoveYTime = mNextMoveYTime + mDurationY;
-        }
-
-        if ((moveX || moveY) && 
-            oldPos.x == mPosition.x &&
-            oldPos.y == mPosition.y) {
-            NotifyReachedObstacle(moveX, moveY, 
-                mDirectionX, mDirectionY,
-                new Point(mPosition.x - oldPos.x, mPosition.y - oldPos.y));
-        }
-    }
-
-    public function UpdateXYSmooth(now:UInt, moveX:Bool, moveY:Bool)
-    {
-        var oldPos = mPosition.clone();
-        if (moveX)
-        {
-            if (moveY)
-            {
-                if (mNextMoveXTime <= mNextMoveYTime) 
-                {
-                    UpdateXSmooth();
-                    if (now >= mNextMoveYTime) {
-                        UpdateYSmooth();
-                    }
-                }
-                else 
-                {
-                    UpdateYSmooth();
-                    if (now >= mNextMoveXTime) {
-                        UpdateXSmooth();
-                    }
-                }
-            }
-            else 
-            {
-                UpdateXSmooth();
-            }
-        }
-        else 
-        {
-            UpdateYSmooth();
-        }
-
-        if ((moveX || moveY) &&            
-            oldPos.x == mPosition.x &&
-            oldPos.y == mPosition.y) {
             NotifyReachedObstacle(
                 moveX, moveY, 
                 mDirectionX, mDirectionY,
@@ -146,30 +53,71 @@ class Movement extends Component
                     mPosition.y - oldPos.y)
             );
         }
-    }
 
-    private function UpdateXSmooth()
-    {
-        if (mDirectionX != 0)
-        {
-            if (!CheckCollision(new Point(mDirectionX, 0)) == true) {
-                Translate(new Point(mDirectionX, 0));
-            }
-            mPrevMoveXTime = mNextMoveXTime;
-            mNextMoveXTime = mNextMoveXTime + mDurationX;
+        if (mCheckOnFloorEnable) {
+            CheckIsOnFloor();
         }
     }
 
-    private function UpdateYSmooth()
+    private function UpdateXSmooth(dt:Float)
     {
-        if (mDirectionY != 0)
+        var xMovingLength = mSpeedX * dt;
+        var xMovingSteps = Math.ceil(Math.abs(xMovingLength));
+        var xMovingPerStep = xMovingLength / xMovingSteps;
+
+        var tryMoving = false;
+        while(xMovingSteps > 0)
         {
-            if (!CheckCollision(new Point(0, mDirectionY)) == true) {
-                Translate(new Point(0, mDirectionY));
+            mAccumulatedXSteps = mAccumulatedXSteps + xMovingPerStep;
+            while(mAccumulatedXSteps > 1 || mAccumulatedXSteps < 0) 
+            {
+                tryMoving = true;
+                mAccumulatedXSteps = mAccumulatedXSteps - mDirectionX;
+
+                if (CheckCollision(new Point(mDirectionX, 0)) == true) 
+                {
+                    xMovingSteps = 0;
+                    mAccumulatedXSteps = 0;
+                }
+                else 
+                {
+                    Translate(new Point(mDirectionX, 0));
+                }
             }
-            mPrevMoveYTime = mNextMoveYTime;
-            mNextMoveYTime = mNextMoveYTime + mDurationY;
+            xMovingSteps--;
         }
+
+        return tryMoving;
+    }
+
+    private function UpdateYSmooth(dt:Float)
+    {
+        var yMovingLength = mSpeedY * dt;
+        var yMovingSteps = Math.ceil(Math.abs(yMovingLength));
+        var yMovingPerStep = yMovingLength / yMovingSteps;
+
+        var tryMoving = false;
+        while(yMovingSteps > 0)
+        {
+            mAccumulatedYSteps = mAccumulatedYSteps + yMovingPerStep;
+            while(mAccumulatedYSteps > 1 || mAccumulatedYSteps < -1) 
+            {
+                tryMoving = true;
+                mAccumulatedYSteps = mAccumulatedYSteps - mDirectionY;
+                if (CheckCollision(new Point(0, mDirectionY)) == true) 
+                {
+                    yMovingSteps = 0;
+                    mAccumulatedYSteps = 0;
+                }
+                else 
+                {
+                    Translate(new Point(0, mDirectionY));
+                }
+            }       
+            yMovingSteps--;
+        }
+
+        return tryMoving;
     }
 
     override public function Dispose()
@@ -196,31 +144,17 @@ class Movement extends Component
 
         if (speed == 0)
         {
-            mDurationX = 0;
             mDirectionX = 0;
-            mPrevMoveXTime = 0;
         }
         else 
         {
             if (speed > 0)
             {
-                mDurationX = Math.floor(1000.0 / speed);
                 mDirectionX = 1;
             }
             else 
             {
-                mDurationX = Math.floor(1000.0 / -speed);
                 mDirectionX = -1;
-            }
-
-            if (mPrevMoveXTime > 0)
-            {
-                mNextMoveXTime = mPrevMoveXTime + mDurationX;
-            }
-            else 
-            {
-                mPrevMoveXTime = System.Now();
-                mNextMoveXTime = mPrevMoveXTime + mDurationX;
             }
         }
     }
@@ -238,39 +172,19 @@ class Movement extends Component
 
         if (speed == 0)
         {
-            mDurationY = 0;
             mDirectionY = 0;
-            mPrevMoveYTime = 0;
         }
         else 
         {
             if (speed > 0)
             {
-                mDurationY = Math.floor(1000.0 / speed);
                 mDirectionY = 1;
             }
             else 
             {
-                mDurationY = Math.floor(1000.0 / -speed);
                 mDirectionY = -1;
             }
-            
-            if (mPrevMoveYTime > 0)
-            {
-                mNextMoveYTime = mPrevMoveYTime + mDurationY;
-            }
-            else 
-            {
-                mPrevMoveYTime = System.Now();
-                mNextMoveYTime = mPrevMoveYTime + mDurationY;
-            }
         }
-    }
-
-    // TODO
-    private function CheckIsOnFloor()
-    {
-
     }
 
     // TODO: optimize
@@ -296,8 +210,6 @@ class Movement extends Component
 
     public function Translate(offset:Point)
     {
-        NotifyPositionChanged();
-
         SetPosition(new Point(
             offset.x + mPosition.x,
             offset.y + mPosition.y));
@@ -317,17 +229,23 @@ class Movement extends Component
         mCurrentEntity.NotifyEntityEvent(EntityEvent_ObstacleReached);
         if (moveY && offset.y == 0)
         {
-            if (mDirectionY > 0) {
-                mIsOnFloor = true;
-            }
 
             SetSpeedY(0);
         }
     }
-    
-    public function NotifyPositionChanged()
+
+    private function CheckIsOnFloor()
     {
         mIsOnFloor = CheckCollision(new Point(0, 1));
+    }
+
+    public function SetCheckOnFloorEnable(enable)
+    {
+        mCheckOnFloorEnable = enable;
+
+        if (enable == false) {
+            mIsOnFloor = false;
+        }
     }
 
     public function SetUpdateSmooth(smooth)

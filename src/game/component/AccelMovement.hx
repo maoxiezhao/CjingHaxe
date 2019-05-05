@@ -6,21 +6,16 @@ import helper.System;
 class AccelMovement extends Movement
 {
     private var mMaxSpeedX:Float = 256;
-    private var mMaxSpeedY:Float = 256;
+    private var mMaxUpSpeedY:Float = 256;
+    private var mMaxDownSpeedY:Float = -320;
 
-    // the unit is pixel/s
     private var mSpeedXAccel:Float = 0;
     private var mSpeedYAccel:Float = 0;
     private var mAccelDirectionX:Float = 0;
     private var mAccelDirectionY:Float = 0;
 
-    private var mNextUpdateSpeedXTime:UInt = 0;
-    private var mDurationUpdateSpeedX:UInt = 0;
-    private var mNextUpdateSpeedYTime:UInt = 0;
-    private var mDurationUpdateSpeedY:UInt = 0;
-
-    static public var gGravityAccel:Float = 352;
-    static public var gMaxUpdateDuration:UInt = 8;
+    static public var gGravityAccel:Float = 800;
+    static public var gMaxUpdateDuration:UInt = 16;
 
     public function new(name:String)
     {
@@ -29,43 +24,31 @@ class AccelMovement extends Movement
 
     override public function Update(dt:Float)
     {
-        UpdateSpeed();
+        UpdateSpeed(dt);
 
         super.Update(dt);
     }
 
-    public function UpdateSpeed()
+    public function UpdateSpeed(dt:Float)
     {
-        var now = System.Now();
-        var updateX = mAccelDirectionX != 0 && now >= mNextUpdateSpeedXTime;
-        var updateY = mAccelDirectionY != 0 && now >= mNextUpdateSpeedYTime;
-
-        while (updateX || updateY)
+        var updateX = mAccelDirectionX != 0;
+        if (updateX)
         {
-            if (updateX)
-            {
-                var speedX = GetSpeedX() + mAccelDirectionX;
-                if (Math.abs(speedX) >= mMaxSpeedX) {
-                    speedX = (speedX > 0) ? mMaxSpeedX : -mMaxSpeedX;
-                }
-                SetSpeedX(speedX);
-
-                mNextUpdateSpeedXTime += mDurationUpdateSpeedX;
+            var speedX = GetSpeedX() + mSpeedXAccel * dt;
+            if (Math.abs(speedX) >= mMaxSpeedX) {
+                speedX = (speedX > 0) ? mMaxSpeedX : -mMaxSpeedX;
             }
+            SetSpeedX(speedX);
+        }
 
-            if (updateY)
-            {
-                var speedY = GetSpeedY() + mAccelDirectionY;
-                if (Math.abs(speedY) >= mMaxSpeedY) {
-                    speedY = (speedY > 0) ? mMaxSpeedY : -mMaxSpeedY;
-                }
-                SetSpeedY(speedY);
-
-                mNextUpdateSpeedYTime += mDurationUpdateSpeedY;
+        var updateY = mAccelDirectionY != 0;
+        if (updateY)
+        {
+            var speedY = GetSpeedY() + mSpeedYAccel * dt;
+            if (speedY > mMaxUpSpeedY || speedY < mMaxDownSpeedY) {
+                speedY = (speedY > 0) ? mMaxUpSpeedY : mMaxDownSpeedY;
             }
-
-            updateX = mAccelDirectionX != 0 && now >= mNextUpdateSpeedXTime;
-            updateY = mAccelDirectionY != 0 && now >= mNextUpdateSpeedYTime;
+            SetSpeedY(speedY);
         }
     }
 
@@ -79,30 +62,18 @@ class AccelMovement extends Movement
 
         if (accel == 0)
         {
-            mDurationUpdateSpeedX = 0;
             mAccelDirectionX = 0;
         }
         else 
         {
             if (accel > 0)
             {
-                mDurationUpdateSpeedX = Math.floor(1000.0 / accel);
                 mAccelDirectionX = 1;
             }
             else 
             {
-                mDurationUpdateSpeedX = Math.floor(1000.0 / -accel);
                 mAccelDirectionX = -1;
             }
-
-            // 对与加速度而言无需保证每次更新1单位速度
-            if (mDurationUpdateSpeedX < gMaxUpdateDuration)
-            {
-                mAccelDirectionX *= (gMaxUpdateDuration / mDurationUpdateSpeedX);
-                mDurationUpdateSpeedX = gMaxUpdateDuration;
-            }
-
-            mNextUpdateSpeedXTime = System.Now() + mDurationUpdateSpeedX;
         }
     }
 
@@ -116,29 +87,18 @@ class AccelMovement extends Movement
 
         if (accel == 0)
         {
-            mDurationUpdateSpeedY = 0;
             mAccelDirectionY = 0;
         }
         else 
         {
             if (accel > 0)
             {
-                mDurationUpdateSpeedY = Math.floor(1000.0 / accel);
                 mAccelDirectionY = 1;
             }
             else 
             {
-                mDurationUpdateSpeedY = Math.floor(1000.0 / -accel);
                 mAccelDirectionY = -1;
             }
-
-            if (mDurationUpdateSpeedY < gMaxUpdateDuration)
-            {
-                mAccelDirectionY *= (gMaxUpdateDuration / mDurationUpdateSpeedY);
-                mDurationUpdateSpeedY = gMaxUpdateDuration;
-            }
-
-            mNextUpdateSpeedYTime = System.Now() + mDurationUpdateSpeedY;
         }
     }
 

@@ -12,6 +12,9 @@ import game.component.BoundingBox;
 import game.component.Movement;
 import game.component.AccelMovement;
 
+//  TODO 
+//  1.关于跳跃，希望实现一个EntityState，以达到不同主角状态下
+//  对相同按键不同的响应
 class Hero extends Entity
 {
     var mBody:AnimationSprite;
@@ -35,6 +38,7 @@ class Hero extends Entity
         var movement = new AccelMovement("PlayerMove");
         movement.SetGravityEnable(true);
         movement.SetUpdateSmooth(true);
+        movement.SetCheckOnFloorEnable(true);
         components.Add(movement);
 
         var boundingBox = new BoundingBox("BoundingBox", 6, 0, 20, 32);
@@ -65,6 +69,7 @@ class Hero extends Entity
         }
     }
 
+    // emm, need entityState???
     override function NotifyGameCommand(commandEvent:GameCommandEvent)
     {
         var dir = GetDirection();
@@ -81,6 +86,10 @@ class Hero extends Entity
         if (commandEvent.command == GameCommand_Jump && commandEvent.isPressed)
         {
             TryJumping();
+        }
+        else if(commandEvent.command == GameCommand_Jump && !commandEvent.isPressed)
+        {
+            TryStoppingJumping();
         }
     }
     
@@ -101,7 +110,18 @@ class Hero extends Entity
     {
         var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
         if (movement.IsOnFloor()) {
-            movement.SetSpeedY(-280);
+            movement.SetSpeedY(-400);
+        }
+    }
+
+    public function TryStoppingJumping()
+    {
+        // 临时实现一个跳跃按键缓冲
+        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
+        if (!movement.IsOnFloor()) {
+            if (movement.GetSpeedY() < -200) {
+                movement.SetSpeedY(-200);
+            }
         }
     }
 }
