@@ -22,6 +22,7 @@ typedef AnimationCondition = {
 
 // TODO:
 // 1. use transition condition or state func??, use state func now.
+// 2. 当前state切换时，应可以配置为播放完成之后切换
 class AnimationManager
 {
     public var mAnimationStates:Map<String, AnimationState>;

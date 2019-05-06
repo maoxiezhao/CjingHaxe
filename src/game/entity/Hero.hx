@@ -11,6 +11,7 @@ import game.GameCommand;
 import game.component.BoundingBox;
 import game.component.Movement;
 import game.component.AccelMovement;
+import game.entity.entityStates.PlayerNormalState;
 
 //  TODO 
 //  1.关于跳跃，希望实现一个EntityState，以达到不同主角状态下
@@ -44,84 +45,12 @@ class Hero extends Entity
         var boundingBox = new BoundingBox("BoundingBox", 6, 0, 20, 32);
         boundingBox.SetDebugEnable(false);
         components.Add(boundingBox);
+
+        SetState(new PlayerWalkingState(this, "walking"));
     }
 
     override function Update(dt:Float)
     {
         super.Update(dt);
-        
-        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
-        var gameCommands = GetGameCommmands();
-        if (gameCommands != null)
-        {
-            if (gameCommands.IsCommandPressed(GameCommand_Right)) 
-            {
-                movement.SetSpeedX(200);
-            }
-            else if (gameCommands.IsCommandPressed(GameCommand_Left)) 
-            {
-                movement.SetSpeedX(-200);
-            }
-            else 
-            {
-                movement.SetSpeedX(0);
-            }
-        }
-    }
-
-    // emm, need entityState???
-    override function NotifyGameCommand(commandEvent:GameCommandEvent)
-    {
-        var dir = GetDirection();
-        if (commandEvent.command == GameCommand_Right && commandEvent.isPressed)
-        {
-            dir = Directoin_Right;
-        }
-        else if(commandEvent.command == GameCommand_Left && commandEvent.isPressed)
-        {
-            dir = Direction_Left;
-        }
-        SetDirection(dir);
-
-        if (commandEvent.command == GameCommand_Jump && commandEvent.isPressed)
-        {
-            TryJumping();
-        }
-        else if(commandEvent.command == GameCommand_Jump && !commandEvent.isPressed)
-        {
-            TryStoppingJumping();
-        }
-    }
-    
-    // TODO
-    public function GetGameCommmands()
-    {
-        if (mCurrentMap != null)
-        {
-            var currentGame = mCurrentMap.mCurrentGame;
-            if (currentGame != null) {
-                return currentGame.mGameCommandManager;
-            }
-        }
-        return null;
-    }
-
-    public function TryJumping()
-    {
-        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
-        if (movement.IsOnFloor()) {
-            movement.SetSpeedY(-400);
-        }
-    }
-
-    public function TryStoppingJumping()
-    {
-        // 临时实现一个跳跃按键缓冲
-        var movement:Movement = cast(GetComponents().GetComponent("PlayerMove"), Movement);
-        if (!movement.IsOnFloor()) {
-            if (movement.GetSpeedY() < -200) {
-                movement.SetSpeedY(-200);
-            }
-        }
     }
 }

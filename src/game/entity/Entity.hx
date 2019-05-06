@@ -5,6 +5,7 @@ import h2d.Object;
 import game.GameCommand;
 import game.Component;
 import game.entity.EntityInclude;
+import game.entity.entityStates.EntityState;
 import helper.Animation;
 import helper.AnimationSprite;
 import helper.AnimationOptionLoader;
@@ -25,6 +26,9 @@ class Entity
     public var mCurrentMap:GameMap;
     public var mCoolDownTimer:CoolDownTimer;
     public var mEventManagement:EventManagement;
+
+    private var mCurrentState:EntityState;
+    private var mPrevStates:EntityState;
 
     // TODO: will refactor component
     private var mComponents:ComponentManager;
@@ -71,6 +75,8 @@ class Entity
         mCoolDownTimer.Update(dt);
         
         mComponents.Update(dt);
+
+        UpdateState(dt);
 
         for (animation in mAnimations) {
             animation.Update(dt);
@@ -154,7 +160,24 @@ class Entity
         return mEntityType; 
     }
 
-    public function NotifyGameCommand(commandEvent:GameCommandEvent) {}
+    public function GetGameCommmands()
+    {
+        if (mCurrentMap != null)
+        {
+            var currentGame = mCurrentMap.mCurrentGame;
+            if (currentGame != null) {
+                return currentGame.mGameCommandManager;
+            }
+        }
+        return null;
+    }
+
+    public function NotifyGameCommand(commandEvent:GameCommandEvent) 
+    {
+        if (mCurrentState != null) {
+            mCurrentState.NotifyGameCommand(commandEvent);
+        }
+    }
 
     public function RegisterEntityEventCallback(event:EntityEvent, callback:Void->Void)
     {
@@ -164,5 +187,28 @@ class Entity
     public function NotifyEntityEvent(event:EntityEvent)
     {
         mEventManagement.NotifyEvent(event);
+    }
+
+    public function SetState(state:EntityState)
+    {
+        var prevState = mCurrentState;
+        if (prevState != null)
+        {
+            prevState.Stop(state);
+            mCurrentState = null;
+        }
+
+        if (state != null)
+        {
+            mCurrentState = state;
+            mCurrentState.Start(prevState);
+        }
+    }
+
+    public function UpdateState(dt:Float)
+    {
+        if (mCurrentState != null) {
+            mCurrentState.Update(dt);
+        }
     }
 }
