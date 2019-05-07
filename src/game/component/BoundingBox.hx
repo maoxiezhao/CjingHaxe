@@ -44,7 +44,7 @@ class BoundingBox extends Component
         }
 
         var eventManagement = mCurrentEntity.mEventManagement;
-        eventManagement.Add(EntityEvent_ObstacleReached, NotifyEntityPositionChanged);
+        eventManagement.Add(EntityEvent_PositionChanged, NotifyEntityPositionChanged);
 
         NotifyEntityPositionChanged();
     }
@@ -56,7 +56,7 @@ class BoundingBox extends Component
         }
 
          var eventManagement = mCurrentEntity.mEventManagement;
-        eventManagement.Remove(EntityEvent_ObstacleReached, NotifyEntityPositionChanged);
+        eventManagement.Remove(EntityEvent_PositionChanged, NotifyEntityPositionChanged);
     }
 
     public function NotifyEntityPositionChanged()

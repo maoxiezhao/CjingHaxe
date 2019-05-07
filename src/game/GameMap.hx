@@ -56,6 +56,7 @@ class GameMap
         mEntities = [];
         mNameEntitiesMap = new Map();
         mCamera = new Camera();
+        mCamera.SetDragmarginRect(new hxd.clipper.Rect(100, 0, 100, 0));
 
         mLayerGrounds = new Array();
 
@@ -107,6 +108,8 @@ class GameMap
 
         var mapLoader = new MapLoader();
         mapLoader.LoadMap(path, this);
+
+        mCamera.SetCurrentMap(this);
 
         mIsLoaded = true;
     }
@@ -174,6 +177,8 @@ class GameMap
             entity.Update(dt);
         }
         
+        mCamera.Update(dt);
+
         if (mDebugObstacleEnable)
         {
             mDebugDrawable.clear();
@@ -211,6 +216,8 @@ class GameMap
     {
       
     }
+
+    public function GetScroller() { return mScroller;}
 
     public function GetGround(layer:Int, x:Int, y:Int):MapGround
     {

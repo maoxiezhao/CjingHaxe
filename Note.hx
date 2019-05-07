@@ -14,17 +14,18 @@
 7. 角色的第一版动画状态（100）
 8. 二段跳跃，跳跃键时间支持(100)
 9. entity state 第一版（100），但是目前和AnimState有点重复，需要考虑下。。。
+10.Camera,非拖拽窗口(80), ，平滑移动，
 
 //////////////// TODO /////////////////////
 // LOGIC
-1. Camera，平滑移动，非拖拽窗口
-2. Suspended支持
+1. Suspended支持
+2. 关卡切换
 
 // EFFECt
 1. 粒子接入（接入heaps的粒子系统）
 
 // SYSTEM
-1. Entity Grid 管理
+1. Entity Grid 管理 (优先级***)
 2. 资源加载管理支持(50) Assets.hx
 3. 简单的UI实现
 
@@ -32,10 +33,12 @@
 1. Debug UI
 2. Movement优化
 3. 动画状态机优化
+4. camera的优化
 
 // design
 1. 移动平台实现
 
 // Other
+1. sounds接入
 
 

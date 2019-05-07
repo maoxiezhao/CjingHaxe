@@ -20,6 +20,8 @@ class Entity
     private var mLayer:Int = 0;
     private var mEntityType:EntityType = EntityType_Unknown;
     private var mPos:Point = new Point(0, 0);
+    private var mWidth:Int = 0;
+    private var mHeight:Int = 0;
     private var mDir:Directions = Direction_Left;
 
     public var mBaseObject:Object;
@@ -89,15 +91,31 @@ class Entity
         return mName;
     }
 
+    public function SetSize(width:Int, height:Int)
+    {
+        mWidth = width;
+        mHeight = height;
+    }
+
+    public function SetPositionX(x:Float) {SetPosition(x, mPos.y);}
+    public function SetPositionY(y:Float) {SetPosition(mPos.x, y);}
     public function SetPosition(x:Float, y:Float)
     {
         mPos.x = x;
         mPos.y = y;
         mBaseObject.setPosition(x, y);
 
-        NotifyEntityEvent(EntityEvent_ObstacleReached);
+        NotifyEntityEvent(EntityEvent_PositionChanged);
     }
     public function GetPosition() { return mPos; }
+
+    public function GetCenterPos() 
+    {
+        return new Point(
+            mPos.x + mWidth * 0.5, 
+            mPos.y + mHeight * 0.5
+        );
+    } 
 
     public function SetCurrentMap(map:GameMap)
     {
