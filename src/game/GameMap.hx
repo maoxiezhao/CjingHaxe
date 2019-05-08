@@ -3,6 +3,7 @@ package game;
 import game.GameCommand;
 import game.entity.Camera;
 import game.entity.Entity;
+import game.entity.Entities;
 import helper.Log;
 import h2d.Bitmap;
 import h2d.col.Point;
@@ -57,6 +58,7 @@ class GameMap
         mNameEntitiesMap = new Map();
         mCamera = new Camera();
         mCamera.SetDragmarginRect(new hxd.clipper.Rect(100, 0, 100, 0));
+        mCamera.SetUpdateSmoothEnable(true);
 
         mLayerGrounds = new Array();
 

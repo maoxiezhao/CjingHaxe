@@ -4,12 +4,17 @@ import h2d.col.Point;
 import hxd.clipper.Rect;
 import Std;
 import game.GameMap;
+import game.component.AccelMovement;
 
+// TODO
+// 如果开启moveSmooth，则镜头移到停止的位置应该再加一个偏移
+// 移动的手感也需要再调整，而不是直接设置一个固定的速度
 class Camera extends Entity
 {
     private var mTarget:Entity;
-    private var mMoveSmooth:Bool = false;
-    private var mMoveSpeed:Float = 6;
+    private var mMoveSmoothEnable:Bool = false;
+    private var mMoveSpeed:Float = 128;
+    private var mMovement:AccelMovement;
     private var mScreenWidth:Int = 0;
     private var mScreenHeight:Int = 0;
     private var mDragMarginRect:Rect;
@@ -21,6 +26,13 @@ class Camera extends Entity
 
         mScreenWidth = screenWidht;
         mScreenHeight = screenheight;
+
+        var components = GetComponents();
+        mMovement = new AccelMovement("PlayerMove");
+        mMovement.SetGravityEnable(false);
+        mMovement.SetCheckCollisionEnable(false);
+        mMovement.SetCheckOnFloorEnable(false);
+        components.Add(mMovement);
     }
 
     public function SetDragmarginRect(rect:Rect)
@@ -82,16 +94,26 @@ class Camera extends Entity
     {
         super.Update(dt);
         
-        trace(mPos.x, mPos.y);
+        mMovement.SetSpeedX(0);
 
         if (mTarget != null)
         {
             var targetPos = mTarget.GetCenterPos();
             if (targetPos.x - mPos.x >= mDragMarginRect.right) {
-                SetPositionX(targetPos.x - mDragMarginRect.right);
+                if (mMoveSmoothEnable) {
+                    mMovement.SetSpeedX(mMoveSpeed);
+                }
+                else {
+                    SetPositionX(targetPos.x - mDragMarginRect.right);
+                }
             }
             else if(mPos.x - targetPos.x >= mDragMarginRect.left) {
-                SetPositionX(targetPos.x + mDragMarginRect.left);
+                if (mMoveSmoothEnable) {
+                    mMovement.SetSpeedX(-mMoveSpeed);
+                }
+                else {
+                    SetPositionX(targetPos.x + mDragMarginRect.left);
+                }
             }
 
             AdaptCamera();
@@ -104,5 +126,10 @@ class Camera extends Entity
             scroller.x = mScreenWidth / 2 - mPos.x;
             scroller.y = mScreenHeight / 2 - mPos.y;
         }
+    }
+
+    public function SetUpdateSmoothEnable(enable)
+    {
+        mMoveSmoothEnable = enable;
     }
 }

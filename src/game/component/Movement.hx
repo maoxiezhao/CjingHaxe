@@ -24,6 +24,7 @@ class Movement extends Component
     private var mUpdateSmooth:Bool = false;
     private var mIsOnFloor:Bool = false;
     private var mCheckOnFloorEnable:Bool = false;
+    private var mCheckCollisionEnable:Bool = false;
 
     public function new(name:String)
     {
@@ -190,6 +191,10 @@ class Movement extends Component
     // TODO: optimize
     public function CheckCollision(offset:Point):Bool
     {
+        if (mCheckCollisionEnable == false) {
+            return false;
+        }
+
         var currentMap = mCurrentEntity.GetCurrentMap();
         if (currentMap != null)
         {
@@ -205,7 +210,7 @@ class Movement extends Component
             }
         }
 
-        return true;
+        return false;
     }
 
     public function Translate(offset:Point)
@@ -251,6 +256,11 @@ class Movement extends Component
     public function SetUpdateSmooth(smooth)
     {
         mUpdateSmooth = smooth;
+    }
+
+    public function SetCheckCollisionEnable(enable) 
+    { 
+        mCheckCollisionEnable = enable;
     }
 
     public function GetSpeedX() { return mSpeedX;}

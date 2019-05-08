@@ -38,7 +38,7 @@ class Hero extends Entity
         var components = GetComponents();
         var movement = new AccelMovement("PlayerMove");
         movement.SetGravityEnable(true);
-        movement.SetUpdateSmooth(true);
+        movement.SetCheckCollisionEnable(true);
         movement.SetCheckOnFloorEnable(true);
         components.Add(movement);
 
