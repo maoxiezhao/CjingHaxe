@@ -37,7 +37,7 @@ class GameMap
     public function new(currentGame:Game)
     {
         mCurrentGame = currentGame;
-
+        
         mScroller = new h2d.Layers();
         currentGame.mRootLayer.add(mScroller, 9);
     }

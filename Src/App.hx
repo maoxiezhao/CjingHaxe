@@ -9,6 +9,7 @@ import game.Game;
 import game.Assets;
 import hxd.System;
 import helper.Log;
+import gui.MainStage;
 
 typedef AppOptions = {
     ?name:String,
@@ -21,6 +22,7 @@ class App extends hxd.App
 {
     public static var mAppOptions(get, null):AppOptions;
     public static var mMainGame:Game;
+    public static var mMainStage:MainStage;
     public var isClosed:Bool = false;
 
     // TEMP
@@ -52,6 +54,8 @@ class App extends hxd.App
         engine.fullScreen = false;
         #end
 
+        mMainStage = new MainStage(this.s2d);
+
         mMainGame = new Game(this);
 
         onResize();
@@ -73,7 +77,7 @@ class App extends hxd.App
         mMainGame.Update(dt);
 
         // DEBUG
-        mFPSText.text =  "DRAW CALLS:" + Std.string(engine.drawCalls) + "  FPS:" + Std.string(Math.ceil(Timer.fps()));
+        mFPSText.text =  "DRAW_CALLS:" + Std.string(engine.drawCalls) + "   FPS:" + Std.string(Math.ceil(Timer.fps()));
     }
 
     override function onResize()
@@ -84,6 +88,7 @@ class App extends hxd.App
     override function dispose()
     {
         super.dispose();
+    
         mMainGame.Dispose();
 
         #if hl

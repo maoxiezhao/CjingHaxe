@@ -49,7 +49,7 @@ class Entities
 
             var grounds:Array<MapGround> = new Array();
             mLayerGrounds.push(grounds);
-            scroller.add(layer, map.GetMaxLayer() - index); 
+            scroller.add(layer, index); 
         }
 
         mDebugDrawable = new h2d.Graphics();

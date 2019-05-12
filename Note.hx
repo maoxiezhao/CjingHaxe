@@ -17,6 +17,9 @@
 10.Camera,非拖拽窗口，平滑移动 第一版(100)
 11.Entities管理结构调整（100）
 
+//////////////// ONGOING /////////////////
+12. 简单GUI实现，进行中(30);
+
 //////////////// TODO /////////////////////
 // LOGIC
 1. Suspended支持
@@ -28,13 +31,6 @@
 // SYSTEM
 1. Grid 管理 (优先级***) (NOW!!!!)
 2. 资源加载管理支持(50) Assets.hx
-3. 简单的UI实现
-
-// OPTIMIZE
-1. Debug UI
-2. Movement优化
-3. 动画状态机优化
-4. camera的优化
 
 // design
 1. 移动平台实现
@@ -42,5 +38,11 @@
 // Other
 1. sounds接入
 2. x2 x4 实现
+
+// OPTIMIZE
+1. Debug UI
+2. Movement优化
+3. 动画状态机优化
+4. camera的优化
 
 
