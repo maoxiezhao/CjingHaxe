@@ -22,7 +22,6 @@ class Game
      
         mRootLayer = new h2d.Layers(mCurrentApp.s2d);   
         mCurrentMap = new GameMap(this);
-        mCurrentMap.mDebugObstacleEnable = false;
 
         mHero = new Hero();
 
@@ -31,7 +30,7 @@ class Game
 
         Logger.Info("The Game Staring.");
         mCurrentMap.LoadMap("tutorial");
-        mCurrentMap.AddEntity(mHero);
+        mCurrentMap.GetEntities().AddEntity(mHero);
     }
 
     public function Update(dt:Float)
@@ -51,11 +50,15 @@ class Game
 
     public function Dispose()
     {
-        mCurrentMap.Dispose();
+        if (mCurrentMap != null) {
+            mCurrentMap.Dispose();
+        }
     }
 
     public function NotifyGameCommand(commandEvent:GameCommandEvent)
     {
-        mHero.NotifyGameCommand(commandEvent);
+        if (mCurrentMap != null) {
+            mCurrentMap.NotifyGameCommand(commandEvent);
+        }
     }
 }

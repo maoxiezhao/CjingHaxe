@@ -13,7 +13,7 @@ class Camera extends Entity
 {
     private var mTarget:Entity;
     private var mMoveSmoothEnable:Bool = false;
-    private var mMoveSpeed:Float = 128;
+    private var mMoveSpeed:Float = 256;
     private var mMovement:AccelMovement;
     private var mScreenWidth:Int = 0;
     private var mScreenHeight:Int = 0;

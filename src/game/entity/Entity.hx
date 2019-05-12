@@ -17,12 +17,13 @@ import helper.CoolDownTimer;
 class Entity
 {
     private var mName:String = "";
-    private var mLayer:Int = 0;
+    private var mLayer:Int = 1;
     private var mEntityType:EntityType = EntityType_Unknown;
     private var mPos:Point = new Point(0, 0);
     private var mWidth:Int = 0;
     private var mHeight:Int = 0;
     private var mDir:Directions = Direction_Left;
+    private var mIsBeRemoved:Bool = false;
 
     public var mBaseObject:Object;
     public var mCurrentMap:GameMap;
@@ -229,4 +230,15 @@ class Entity
             mCurrentState.Update(dt);
         }
     }
+
+    public function SetIsBeRemoved()
+    {
+        if (mIsBeRemoved == false) 
+        {
+            NotifyEntityEvent(EntityEvent_ToBeRemoved);
+            mIsBeRemoved = true;
+        }
+    }
+
+    public function GetIsBeRemoved() { return mIsBeRemoved; }
 }

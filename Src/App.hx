@@ -1,5 +1,7 @@
 package;
 
+import h3d.Engine;
+import hxd.Timer;
 import hxd.Window;
 import h3d.impl.MacroHelper;
 import hxd.App;
@@ -20,6 +22,9 @@ class App extends hxd.App
     public static var mAppOptions(get, null):AppOptions;
     public static var mMainGame:Game;
     public var isClosed:Bool = false;
+
+    // TEMP
+    private var mFPSText:h2d.Text;
 
     public function new(?options:AppOptions)
     {
@@ -50,6 +55,10 @@ class App extends hxd.App
         mMainGame = new Game(this);
 
         onResize();
+
+        // DEBUG
+        var font : h2d.Font = hxd.res.DefaultFont.get();
+        mFPSText = new h2d.Text(font, s2d);
     }
 
     override function update(dt:Float)
@@ -62,6 +71,9 @@ class App extends hxd.App
         super.update(dt);
 
         mMainGame.Update(dt);
+
+        // DEBUG
+        mFPSText.text =  "DRAW CALLS:" + Std.string(engine.drawCalls) + "  FPS:" + Std.string(Math.ceil(Timer.fps()));
     }
 
     override function onResize()

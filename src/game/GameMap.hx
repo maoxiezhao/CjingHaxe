@@ -4,16 +4,13 @@ import game.GameCommand;
 import game.entity.Camera;
 import game.entity.Entity;
 import game.entity.Entities;
+import game.entity.MapTile;
+
 import helper.Log;
+
 import h2d.Bitmap;
 import h2d.col.Point;
 import Std;
-
-enum MapGround
-{
-    GROUND_EMPTY;
-    GROUND_WALL;
-}
 
 // 地图类，地图类管理所有的Entity，同时负责关卡的加载与切换
 // TODO：
@@ -24,82 +21,35 @@ class GameMap
 {
     public var mCurrentGame:Game;
     public var mIsLoaded:Bool = false;
-    public var mCamera:Camera;
-
-    public var mEntities:Array<Entity>;
-    public var mNameEntitiesMap:Map<String, Entity>;
-
-    // TODO Begin
-    public var mLayerGrounds:Array<Array<MapGround>>;
-    public var mDebugObstacleEnable:Bool = false;
-    public var mDebugDrawable:h2d.Graphics;
-    // TODO End
-
     public var mMapName:String = "";
     public var mMapWidth:Int;
     public var mMapHeight:Int;
     public var mMapTileRowNumber:Int;
     public var mMapTileColNumber:Int;
+    public var mMaxLayers :Int = 3;
+    public var mCellGroundWidth:Int = 32;
+    public var mCellGroundHeight:Int = 32;
 
-    public var mBackground:h2d.Bitmap = null;
-
-    public static var mMaxLayers :Int = 3;
-    public static var mCellGroundWidth:Int = 32;
-    public static var mCellGroundHeight:Int = 32;
-
-    // 目前提供3个层级
-    public var mScroller:h2d.Layers;
-    public var mCurrentLayers:Array<h2d.Layers>;
+    private var mScroller:h2d.Layers;
+    private var mBackground:h2d.Bitmap = null;
+    private var mEntities:Entities;
 
     public function new(currentGame:Game)
     {
         mCurrentGame = currentGame;
-        mEntities = [];
-        mNameEntitiesMap = new Map();
-        mCamera = new Camera();
-        mCamera.SetDragmarginRect(new hxd.clipper.Rect(100, 0, 100, 0));
-        mCamera.SetUpdateSmoothEnable(true);
-
-        mLayerGrounds = new Array();
-
-        mDebugDrawable = new h2d.Graphics();
-        currentGame.mRootLayer.add(mDebugDrawable, 10);
 
         mScroller = new h2d.Layers();
         currentGame.mRootLayer.add(mScroller, 9);
-
-        // layer 1..3 zpos  is 3 .. 1
-        // backgound zpos is 0
-        mCurrentLayers = new Array();
-        for (index in 0...3)
-        {
-            var layer = new h2d.Layers();
-            mCurrentLayers.push(layer);
-            mScroller.add(layer, mMaxLayers - index); 
-
-            var grounds:Array<MapGround> = new Array();
-            mLayerGrounds.push(grounds);
-        }
     }
 
     public function Dispose()
     {
-        for(entity in mEntities) {
-            entity.Dispose();
-        }
-        mEntities = null;
+        mEntities.Dispose();
         
-        for(layer in mCurrentLayers) {
-            layer.removeChildren();
-            layer.remove();
-        }
-        mCurrentLayers = null;
-
         mScroller.removeChildren();
         mScroller.remove();
 
         mCurrentGame = null;
-        mCamera = null;   
     }
 
     public function LoadMap(path:String)
@@ -110,63 +60,12 @@ class GameMap
 
         var mapLoader = new MapLoader();
         mapLoader.LoadMap(path, this);
+        mEntities = new Entities(this);
 
-        mCamera.SetCurrentMap(this);
+        // TODO: 为了保证处理Grounds时，entities已经存在，故将处理延后
+        mapLoader.ProcessMapGrounds(this);
 
         mIsLoaded = true;
-    }
-
-    public function AddEntity(entity:Entity, layerIndex:Int = 1)
-    {
-        var name = entity.GetName();
-        var layer:h2d.Layers = GetLayerByIndex(layerIndex);
-        if (layer == null)
-        {
-            Logger.Waring("The Adding Entity named" + name + 
-                " has an invalid layer:" + layer);
-            return;
-        }
-        layer.add(entity.mBaseObject, 1);
-
-        if (name != "")
-        {
-            if (mNameEntitiesMap.exists(name)) {
-                // TODO:instead of log
-                Logger.Waring("The Adding Entity named" + name + 
-                    " has already exists and replace older.");
-            }
-            mNameEntitiesMap.set(name, entity);
-        }
-        mEntities.push(entity);
-
-        // tracing hero
-        if (entity.GetEntityType() == EntityType_Hero) 
-        {
-            mCamera.TraceTarget(entity);
-        }
-
-        entity.SetLayer(layerIndex);
-        entity.SetCurrentMap(this);
-    }
-
-    public function GetLayerByIndex(index:Int)
-    {
-        if (index < 0 || index >= 3)
-        {
-            Logger.Error("Invalid index");
-            return null;
-        }
-        return mCurrentLayers[index];
-    }
-
-    public function RemoveEntity(entity:Entity)
-    {
-        mEntities.remove(entity);
-
-        var name = entity.GetName();
-        if (name != "")  {
-            mNameEntitiesMap.remove(name);
-        }
     }
 
     public function Update(dt:Float)
@@ -175,30 +74,7 @@ class GameMap
             return;
         }
 
-        for(entity in mEntities) {
-            entity.Update(dt);
-        }
-        
-        mCamera.Update(dt);
-
-        if (mDebugObstacleEnable)
-        {
-            mDebugDrawable.clear();
-            mDebugDrawable.beginFill(0xFFFFFF);
-            var grounds = mLayerGrounds[1];
-
-            var index = 0;
-            for (ground in grounds)
-            {
-                if (ground == GROUND_WALL)
-                    mDebugDrawable.drawRect(
-                        index % mMapTileColNumber * mCellGroundWidth, 
-                        Math.floor(index / mMapTileColNumber) * mCellGroundHeight, 
-                        mCellGroundWidth, mCellGroundHeight);
-
-                index++;
-            }
-        }
+        mEntities.Update(dt);
     }
 
     public function SetCurrentBackground(background:h2d.Bitmap)
@@ -216,17 +92,12 @@ class GameMap
 
     public function NotifyGameCommand(commandEvent:GameCommandEvent)
     {
-      
+        mEntities.NotifyGameCommand(commandEvent);
     }
 
     public function GetScroller() { return mScroller;}
-
-    public function GetGround(layer:Int, x:Int, y:Int):MapGround
-    {
-        var grounds = mLayerGrounds[layer];
-        var index = Math.floor(y / mCellGroundHeight) * mMapTileColNumber + Math.floor(x / mCellGroundWidth);
-        return grounds[index];
-    }
+    public function GetMaxLayer() { return mMaxLayers;}
+    public function GetEntities() { return mEntities; }
 
     //**********************************************************************/
     // Check Collision
@@ -254,8 +125,8 @@ class GameMap
 
     // 与简单的ground检查碰撞，基于32x32的网格
     public function CheckCollisionWithGround(layer:Int, x:Int, y:Int)
-    {
-        var ground = GetGround(layer, x, y);
+    {    
+        var ground = mEntities.GetGround(layer, Math.floor(x / mCellGroundWidth), Math.floor(y / mCellGroundHeight));
         var cantMove = false;
         switch (ground) {
             case GROUND_EMPTY:

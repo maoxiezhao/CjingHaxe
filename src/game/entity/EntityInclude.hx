@@ -12,6 +12,7 @@ enum EntityEvent
 {
     EntityEvent_PositionChanged;
     EntityEvent_ObstacleReached;
+    EntityEvent_ToBeRemoved;
 }
 
 class EventManagement

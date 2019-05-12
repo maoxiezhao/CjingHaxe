@@ -32,6 +32,7 @@ typedef MapData = {
 // 2. support animation tile
 class MapLoader
 {
+    public var mMapData:MapData;
     public var mMapWidth:Int;
     public var mMapHeight:Int;
     public var mMapTileWidth:Int;
@@ -50,22 +51,29 @@ class MapLoader
         }
 
         var mapJsonText = hxd.Res.loader.load(jsonPath);
-        var mapData:MapData = Json.parse(mapJsonText.toText());
+        mMapData = Json.parse(mapJsonText.toText());
 
-        mMapTileWidth = mapData.tilewidth;
-        mMapTileHeight = mapData.tileheight;
-        mMapWidth = mapData.width;
-        mMapHeight = mapData.height;
+        mMapTileWidth = mMapData.tilewidth;
+        mMapTileHeight = mMapData.tileheight;
+        mMapWidth = mMapData.width;
+        mMapHeight = mMapData.height;
 
         map.mMapTileColNumber = mMapWidth;
         map.mMapTileRowNumber = mMapHeight;
         map.mMapWidth = mMapWidth * mMapTileWidth;
         map.mMapHeight = mMapHeight * mMapTileHeight;
 
+        for(property in mMapData.properties) {
+            ProcessMapProperty(property, map);
+        }
+    }
+
+    public function ProcessMapGrounds(map:GameMap)
+    {
         // load map tileset
         // only support firset tileset now.
         var tilesetName:String = "";
-        for (mapTilesetData in mapData.tilesets)
+        for (mapTilesetData in mMapData.tilesets)
         {
             var strings = mapTilesetData.source.split(".");
             tilesetName = strings[0];
@@ -76,11 +84,7 @@ class MapLoader
             return;
         }
 
-        for(property in mapData.properties) {
-            ProcessMapProperty(property, map);
-        }
-
-        ProcessMapGround(mapData, tileset, map);
+        ProcessMapGround(mMapData, tileset, map);
     }
 
     public function ProcessMapProperty(property:MapDataProperty, map:GameMap)
@@ -108,11 +112,11 @@ class MapLoader
         var layerIndex = 0;
         for(layer in mapData.layers)
         {
-            if (layerIndex >= GameMap.mMaxLayers) {
+            if (layerIndex >= map.GetMaxLayer()) {
                 return; 
             }
 
-            var mapGround = map.mLayerGrounds[layerIndex];
+            var mapGround = map.GetEntities().GetGroundByLayer(layerIndex);
             mapGround.resize(mapSize);
             for (index in 0...mapSize)
             {
@@ -135,7 +139,7 @@ class MapLoader
                 }
             }
 
-            var layer:h2d.Layers = map.GetLayerByIndex(layerIndex);
+            var layer:h2d.Layers = map.GetEntities().GetLayerByIndex(layerIndex);
             if (layer != null) {
                 layer.addChild(group);
             }
