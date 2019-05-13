@@ -1,6 +1,8 @@
 package gui;
 
+import hxd.Math;
 import haxe.xml.Access;
+import helper.StringUtils;
 import gui.widgets.Frame;
 
 // wrap functions
@@ -26,7 +28,16 @@ class XMLHelper
     public static function XMLGetNumber(data:Xml, attr:String, defaultNumber:Float = 0)
     {
         var str:String = XMLGetStr(data, attr, Std.string(defaultNumber));
-        return Std.parseFloat(str);
+        if (StringUtils.CheckIsNumber(str)){
+            return Std.parseFloat(str);
+        }
+        var number = StringUtils.GetPercentNumber(str);
+        if (!Math.isNaN(number))
+        {
+            return number;
+        }
+
+        return defaultNumber;
     }
 
     public static function XMLGetX(data:Access, defaultValue:Float = 0)
@@ -38,4 +49,16 @@ class XMLHelper
     {
         return XMLGetNumber(data.x, "y", 0);
     }
+
+    public static function XMLGetWidth(data:Access, defaultValue:Float = 0)
+    {
+        return XMLGetNumber(data.x, "width", 0);
+    }
+
+    public static function XMLGetHeight(data:Access, defaultValue:Float = 0)
+    {
+        return XMLGetNumber(data.x, "height", 0);
+    }
+
+
 }

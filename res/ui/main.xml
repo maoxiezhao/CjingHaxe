@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>	
-	<image id="back" src="ui/title_back2" center_x="true" center_y="true" group="title">
-		<scale width="100%" height="100%"/>
+	<image id="back" src="map/tutorial_background" center_x="true" center_y="true" width="200" height="100" group="title">
+		<scale width="10%" height="10%"/>
 	</image>
 	
 	<button id="saves" center_x="true" x="-100" y="505" use_def="text_button" group="top" label="$TITLE_SAVES">

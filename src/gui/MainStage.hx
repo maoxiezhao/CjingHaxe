@@ -3,6 +3,8 @@ package gui;
 import gui.UILoader;
 import gui.widgets.WidgetFactory;
 
+// TODO 
+// will support layout
 class MainStage
 {
     private var mRootLayer:h2d.Layers;
