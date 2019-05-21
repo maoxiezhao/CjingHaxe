@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>	
-	<image id="back" src="map/tutorial_background" center_x="true" center_y="true" width="200" height="100" group="title">
-		<scale width="10%" height="10%"/>
-	</image>
-	
-	<button id="saves" center_x="true" x="-100" y="505" use_def="text_button" group="top" label="$TITLE_SAVES">
+	<!-- <image id="back" src="map/tutorial_background" center_x="true" center_y="true" width="200" height="100" group="title"/>
+	-->
+	<!-- <button id="saves" center_x="true" x="-100" y="505" use_def="text_button" group="top" label="$TITLE_SAVES">
 		<param type="string" value="saves"/>
+	</button> -->
+
+	<button id="scaledsrc" center_x="true" x="-200" y="350" group="top" label="SCALED SRC" width="200" height="100">
+		<graphic id="all" image="map/tutorial_background" slice9="24,24,48,48" src_h="72">
+			<scale_src scale="screen.height/1200"/>
+		</graphic>
+		<param type="string" value="scaledsrc"/>
 	</button>
 </data>

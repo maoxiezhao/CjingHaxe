@@ -40,6 +40,15 @@ class XMLHelper
         return defaultNumber;
     }
 
+    public static function XMLGetBool(data:Xml, attr:String, defaultValue:Bool = true)
+    {
+        if (data.get(attr) != null){
+            var value:String = data.get(attr);
+            return (value == "true" || value == "1") ? true : false; 
+        }
+        return defaultValue;
+    }
+
     public static function XMLGetX(data:Access, defaultValue:Float = 0)
     {
         return XMLGetNumber(data.x, "x", 0);

@@ -9,7 +9,11 @@ import gui.widgets.Frame;
 // TEMP
 class UILoader
 {
-    public function new(){}
+    private var mMainStage:MainStage;
+
+    public function new(mainStage:MainStage){
+        mMainStage = mainStage;
+    }
 
     public function ParseUIXML(id:String) 
     {
@@ -46,7 +50,7 @@ class UILoader
 
     public function ProcessXMLData(data:Access)
     {
-        var frame = new Frame();
+        var frame = mMainStage.GetRootFrame();
         frame.Load(data);
         return frame;
     }

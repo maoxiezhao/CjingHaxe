@@ -9,6 +9,7 @@ import game.Game;
 import game.Assets;
 import hxd.System;
 import helper.Log;
+import helper.System;
 import gui.MainStage;
 
 typedef AppOptions = {
@@ -38,6 +39,12 @@ class App extends hxd.App
             mAppOptions.width = options.width;
             mAppOptions.height = options.height;
         }
+        else 
+        {
+            options = get_mAppOptions();
+        }
+
+        helper.System.mScreenSize = new h2d.col.Point(options.width, options.height);
 
         hxd.Timer.wantedFPS = mAppOptions.frameRate;
         hxd.Res.initEmbed({compressSounds:true});
