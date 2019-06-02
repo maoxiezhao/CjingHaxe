@@ -69,5 +69,18 @@ class XMLHelper
         return XMLGetNumber(data.x, "height", 0);
     }
 
+    public static function XMLGetIntArray(data:Access, attr:String)
+    {
+        var result:Array<Int> = new Array();
+        var str = XMLGetStr(data.x, attr);
+        var strArray = str.split(",");
+        for(subStr in strArray)
+        {
+            if (StringUtils.CheckIsNumber(subStr)){
+                result.push(Std.parseInt(subStr));
+            }
+        }
 
+        return result;
+    }
 }

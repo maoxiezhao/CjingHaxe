@@ -5,6 +5,7 @@ import hxd.Res.loader;
 import helper.Log;
 
 import gui.widgets.Frame;
+import gui.widgets.WidgetFactory;
 
 // TEMP
 class UILoader
@@ -51,7 +52,9 @@ class UILoader
     public function ProcessXMLData(data:Access)
     {
         var frame = mMainStage.GetRootFrame();
-        frame.Load(data);
+        var newFrame = WidgetFactory.LoadFromData(data);
+
+        frame.addChild(newFrame);
         return frame;
     }
 }
