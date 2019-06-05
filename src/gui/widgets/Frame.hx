@@ -19,5 +19,8 @@ class Frame extends h2d.Sprite
     public function SetName(name:String) { mName = name; }
     public function GetName() { return mName;}
 
-   
+    public function SetSize(width:Int, height:Int)
+    {
+    
+    }
 }

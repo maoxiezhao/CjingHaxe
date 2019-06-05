@@ -6,8 +6,8 @@
 		<param type="string" value="saves"/>
 	</button> -->
 
-	<button id="scaledsrc" center_x="true" x="200" y="100" group="top" label="SCALED SRC" width="200" height="100">
-		<graphic id="all" image="img/test" slice9="124,124,248,248" src_h="72">
+	<button id="scaledsrc" center_x="true" x="100" y="100" group="top" label="SCALED SRC" width="200" height="200">
+		<graphic id="all" image="img/test" slice9="100,100,400,500" src_h="72">
 			<scale_src scale="screen.height/1200"/>
 		</graphic>
 		<param type="string" value="scaledsrc"/>

@@ -8,13 +8,16 @@ import Std.int;
 
 class Image extends Frame
 {
+    public var mOriginTile:h2d.Tile;
     public var mSlice9Images:Array<h2d.Bitmap>;
+    public var mPosNameImageMap:Map<String, h2d.Bitmap>;
 
     public function new()
     {
         super();
 
-        mSlice9Images = new Array<h2d.Bitmap>();
+        mSlice9Images = new Array();
+        mPosNameImageMap = new Map();
     }
 
     public function LoadSlice9Image(src:String, slice9:Array<Int>)
@@ -47,36 +50,70 @@ class Image extends Frame
 
         for (i in 0...9)
         {
-            var rect = 
-            switch(i)
-            {
-                case 0: rects.get("top.left");
-                case 1: rects.get("top");
-                case 2: rects.get("top.right");
-                case 3: rects.get("left");
-                case 4: rects.get("middle");
-                case 5: rects.get("right");
-                case 6: rects.get("bottom.left");
-                case 7: rects.get("bottom");
-                case 8: rects.get("bottom.right");
-                default: rects.get("top.left");
-            }
+            var name = GetPosNameByIndex(i);
+            var rect = rects.get(name);
+           
             var newTile = srcTile.sub(rect.left, rect.top, rect.right, rect.bottom);
-            var newBitmap = new h2d.Bitmap(newTile);
-            newBitmap.x = rect.left;
-            newBitmap.y = rect.top;
+            var newImage = new h2d.Bitmap(newTile);
+            newImage.x = rect.left;
+            newImage.y = rect.top;
 
-            mSlice9Images.push(newBitmap);
-            this.addChild(newBitmap);
+            mSlice9Images.push(newImage);
+            mPosNameImageMap.set(name, newImage);
+
+            this.addChild(newImage);
         }
+
+        mOriginTile = srcTile;
     }
 
-    public function Resize(w:Float, h:Float)
+    public function Resize(newWidth:Float, newHeight:Float)
     {
-        var oldWidth = this.getSize().width;
-        var oldHeight = this.getSize().height;
+        // var oldWidth = mOriginTile.width;
+        // var oldHeight = mOriginTile.height;
 
-        var scaleX = w / oldWidth;
-        var scaleY = h / oldHeight;
+        // var tl = mPosNameImageMap.get("top.left");
+        // var tr = mPosNameImageMap.get("top.right");
+        // if (tr != null) {
+        //     tr.x = newWidth - tr.width;
+        // }
+        // var t = mPosNameImageMap.get("top");
+        // if (t != null) 
+        // {
+        //     t.x = tl.width;
+        //     t.width = newWidth - tl.width - tr.width; 
+        // }
+
+        // mPosNameImageMap.get("bottom").scaleX = scaleX;
+
+        // mPosNameImageMap.get("left").scaleY = scaleY;
+        // mPosNameImageMap.get("right").scaleY = scaleY;
+
+        // mPosNameImageMap.get("middle").scaleX = scaleX;
+        // mPosNameImageMap.get("middle").scaleY = scaleY;
     }    
+
+    private function GetPosNameByIndex(index:Int)
+    {
+        var name = "top.left";
+        switch(index)
+        {
+            case 0: name = "top.left";
+            case 1: name = "top";
+            case 2: name = "top.right";
+            case 3: name = "left";
+            case 4: name = "middle";
+            case 5: name = "right";
+            case 6: name = "bottom.left";
+            case 7: name = "bottom";
+            case 8: name = "bottom.right";
+            default: name = "top.left";
+        }
+        return name;
+    }
+
+    override public function SetSize(width:Int, height:Int)
+    {
+        Resize(width, height);
+    }
 }

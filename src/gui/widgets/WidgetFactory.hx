@@ -200,6 +200,11 @@ class WidgetFactory
                 }
             }
 
+            for (image in imageArray)
+            {
+                image.SetSize(width, height);
+            }
+
             button.LoadImage(imageArray, width, height);
         }
 
