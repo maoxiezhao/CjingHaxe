@@ -32,7 +32,7 @@ typedef LabelOptions = {
     A simple label control
     Additional Signals: onchange
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Label extends Control {
 
         /** The text displayed by the label */

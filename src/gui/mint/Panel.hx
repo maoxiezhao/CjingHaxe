@@ -19,7 +19,7 @@ typedef PanelOptions = {
     A simple blank panel control
     Additional Signals: none
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Panel extends Control {
 
     var options: PanelOptions;

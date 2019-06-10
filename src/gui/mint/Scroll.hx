@@ -19,7 +19,7 @@ typedef ScrollOptions = {
 } //ScrollOptions
 
 
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Scroll extends Control {
 
     public var scrollh: gui.mint.Control;

@@ -2,39 +2,37 @@ package gui.mint.render.luxe;
 
 import gui.mint.types.Types;
 import gui.mint.render.Rendering;
-
 import gui.mint.render.luxe.LuxeMintRender;
 import gui.mint.render.luxe.Convert;
+import gui.mint.render.CjingMintRender;
 
-import luxe.Color;
-import luxe.Sprite;
-import luxe.Vector;
-import luxe.Log.*;
+import h2d.Graphics;
+import h2d.Sprite;
 
 private typedef LuxeMintCheckboxOptions = {
-    var color: Color;
-    var color_hover: Color;
-    var color_node: Color;
-    var color_node_hover: Color;
+    var color: UInt;
+    var color_hover: UInt;
+    var color_node: UInt;
+    var color_node_hover: UInt;
     var size_margin: Null<Float>;
 }
 
 class Checkbox extends gui.mint.render.Render {
 
     public var checkbox : gui.mint.Checkbox;
-    public var visual : Sprite;
-    public var node : Sprite;
-    public var node_off : Sprite;
+    public var visual : h2d.Sprite;
+    public var node : h2d.Sprite;
+    public var node_off : h2d.Sprite;
 
-    public var color: Color;
-    public var color_hover: Color;
-    public var color_node: Color;
-    public var color_node_hover: Color;
+    public var color: UInt;
+    public var color_hover: UInt;
+    public var color_node: UInt;
+    public var color_node_hover: UInt;
     public var size_margin: Float;
 
-    var render: LuxeMintRender;
+    var render: CjingMintRender;
 
-    public function new(_render:LuxeMintRender, _control:gui.mint.Checkbox) {
+    public function new(_render:CjingMintRender, _control:gui.mint.Checkbox) {
 
         checkbox = _control;
         render = _render;

@@ -22,7 +22,7 @@ typedef ProgressOptions = {
     A simple progress control, ranging from 0 to 1.
     Additional Signals: onchange
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Progress extends Control {
 
     @:isVar public var progress (default, set) : Float = 0.5;

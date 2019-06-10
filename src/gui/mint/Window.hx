@@ -39,7 +39,7 @@ typedef WindowOptions = {
 } //WindowOptions
 
 
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Window extends Control {
 
     public var title : Label;

@@ -3,42 +3,39 @@ package gui.mint.core;
 // Contibuted by Michael Bickel http://github.com/dazKind
 
 import haxe.macro.Expr;
+import helper.Log;
 
-class Signal<T> {
-
+class Signal<T> 
+{
     public var listeners:Array<T>;
 
     public function new() {
 
         listeners = [];
+    } 
 
-    } //new
-
-    public function listen( _handler:T ):Void {
-
+    public function listen( _handler:T ):Void
+    {
         if( listeners.indexOf(_handler) != -1 ) {
-            throw "mint / signal / listen / attempted to add the same listener twice";
+            Logger.Error("mint / signal / listen / attempted to add the same listener twice");
             return;
         }
 
         listeners.push(_handler);
+    }
 
-    } //listen
-
-    public function remove( _handler:T ):Void {
-
+    public function remove( _handler:T ):Void 
+    {
         var _index = listeners.indexOf(_handler);
         if(_index != -1) {
             listeners[_index] = null;
         }
+    } 
 
-    } //remove
-
-    public inline function has( _handler:T ):Bool {
-
+    public inline function has( _handler:T ):Bool 
+    {
         return listeners.indexOf(_handler) != -1;
-
-    } //has
+    }
 
     public inline function clear() {
         listeners = null;
@@ -67,6 +64,5 @@ class Signal<T> {
                 }
             }
         }
-    } //emit
-
-} //Signal
+    } 
+} 

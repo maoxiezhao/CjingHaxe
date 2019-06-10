@@ -65,7 +65,7 @@ typedef ControlOptions = {
     Base class for all controls
     handles propogation of events,
     mouse handling, layout and so on */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Control {
 
         /** The name of this control. default: 'control'*/

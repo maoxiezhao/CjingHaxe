@@ -5,22 +5,24 @@ import gui.mint.render.Rendering;
 import gui.mint.Control;
 import gui.mint.types.Types;
 
+import h2d.Object;
+
 /** The basic implementation for a control Renderer.
     This includes convenience functions and implementation
     of the base control events which are called
     to simplify integration. Be aware of the timing of signals. */
-class Render implements Renderer {
+class Render extends h2d.Object implements Renderer {
 
     var rendering : Rendering;
     var control : Control;
-    var scale (get, never) : Float;
-
+    
     var sx (get, never) : Float;
     var sy (get, never) : Float;
     var sw (get, never) : Float;
     var sh (get, never) : Float;
 
     function new( _render:Rendering, _control:gui.mint.Control ) {
+        super();
 
         control = _control;
         rendering = _render;

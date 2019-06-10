@@ -28,7 +28,7 @@ typedef CanvasOptions = {
     propagating them to the children.
     Additional Signals: none
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Canvas extends Control {
 
         /** The current focused control, null if none */
@@ -109,7 +109,7 @@ class Canvas extends Control {
 
 //Internal
 
-    @:allow(mint.Control)
+    @:allow(gui.mint.Control)
     var depth_idx = 0.0;
 
     function apply_depth(control:Control) {
@@ -123,7 +123,7 @@ class Canvas extends Control {
 
     } //apply_depth
 
-    @:allow(mint.Control)
+    @:allow(gui.mint.Control)
     function sync_depth() {
 
         depth_idx = 0;

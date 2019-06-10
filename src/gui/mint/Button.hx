@@ -20,7 +20,7 @@ typedef ButtonOptions = {
     A simple button with a label
     Additional Signals: none
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Button extends Control {
 
         /** The label the button displays */

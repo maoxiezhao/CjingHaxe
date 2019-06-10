@@ -27,7 +27,7 @@ typedef CheckboxOptions = {
     Changing the state will trigger the signal.
     Additional Signals: onchange
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Checkbox extends Control {
 
         /** The current state. Read/Write */

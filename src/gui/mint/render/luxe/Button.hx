@@ -2,57 +2,50 @@ package gui.mint.render.luxe;
 
 import gui.mint.types.Types;
 import gui.mint.render.Rendering;
-
 import gui.mint.render.luxe.LuxeMintRender;
 import gui.mint.render.luxe.Convert;
+import gui.mint.render.CjingMintRender;
 
-import luxe.Color;
-import luxe.Sprite;
-import luxe.Vector;
-import luxe.Log.*;
+import h2d.Graphics;
+import h2d.Sprite;
 
 private typedef LuxeMintButtonOptions = {
-    var color: Color;
-    var color_hover: Color;
-    var color_down: Color;
+    var color: UInt;
+    var color_hover: UInt;
+    var color_down: UInt;
 }
 
 class Button extends gui.mint.render.Render {
 
     public var button : gui.mint.Button;
     public var visual : Sprite;
+    
+    public var mGraphics : h2d.Graphics;
+    public var color: UInt;
+    public var color_hover: UInt;
+    public var color_down: UInt;
 
-    public var color: Color;
-    public var color_hover: Color;
-    public var color_down: Color;
+    private var mRender: CjingMintRender;
 
-    var render: LuxeMintRender;
-
-    public function new(_render:LuxeMintRender, _control:gui.mint.Button) {
+    public function new(_render:CjingMintRender, _control:gui.mint.Button) 
+    {
+        super(render, _control);
 
         render = _render;
         button = _control;
-
-        super(render, _control);
-
         var _opt: LuxeMintButtonOptions = button.options.options;
 
-        color = def(_opt.color, new Color().rgb(0x373737));
-        color_hover = def(_opt.color_hover, new Color().rgb(0x445158));
-        color_down = def(_opt.color_down, new Color().rgb(0x444444));
+        color = 0x373737;
+        color_hover = 0x445158;
+        color_down = 0x444444;
 
-        visual = new luxe.Sprite({
-            name: control.name+'.visual',
-            batcher: render.options.batcher,
-            no_scene: true,
-            centered: false,            
-            pos: new Vector(sx, sy),
-            size: new Vector(sw, sh),
-            color: color,
-            depth: render.options.depth + control.depth,
-            visible: control.visible
-        });
+        mGraphics = new h2d.Graphics(this);
+        mGraphics.color = color;
+        mGraphics.visible = control.visible;
 
+        mGraphics.clear();
+        mGraphics.drawRect(sx, sy, sx + sw, sy + sh);
+        
         update_clip(scale);
 
         button.onmouseenter.listen(function(e,c) { visual.color = color_hover; });
@@ -62,49 +55,42 @@ class Button extends gui.mint.render.Render {
 
     } //new
 
-    function update_clip(_scale:Float) {
-        
-        visual.clip_rect = Convert.clip_bounds(control.clip_with, render.options.batcher.view, _scale);
+    function update_clip(_scale:Float) 
+    {
+        // color button dont't need clip
+        // visual.clip_rect = Convert.clip_bounds(control.clip_with, render.options.batcher.view, _scale);
 
     } //update_clip
 
-    override function onscale(_scale:Float, _prev_scale:Float) {
-        
+    override function onscale(_scale:Float, _prev_scale:Float) 
+    {  
         update_clip(_scale);
+    }
 
-    } //onscale
-
-    override function onbounds() {
-
-        visual.transform.pos.set_xy(sx, sy);
-        visual.geometry_quad.resize_xy(sw, sh);
-
-    } //onbounds
+    override function onbounds() 
+    {
+        mGraphics.clear();
+        mGraphics.drawRect(sx, sy, sx + sw, sy + sh);
+    } 
 
     override function ondestroy() {
 
-        visual.destroy();
-        visual = null;
+        mGraphics.remove();
+        mGraphics = null;
+    } 
 
-    } //ondestroy
-
-    override function onclip(_disable:Bool, _x:Float, _y:Float, _w:Float, _h:Float) {
-
+    override function onclip(_disable:Bool, _x:Float, _y:Float, _w:Float, _h:Float) 
+    {
         update_clip(scale);
-        
-    } //onclip
+    } 
 
+    override function onvisible(_visible:Bool) 
+    {
+        mGraphics.visible = _visible;
+    } 
 
-    override function onvisible(_visible:Bool) {
-
-        visual.visible = _visible;
-
-    } //onvisible
-
-    override function ondepth(_depth:Float) {
-
-        visual.depth = render.options.depth + _depth;
-
+    override function ondepth(_depth:Float) 
+    {
     } //ondepth
 
 

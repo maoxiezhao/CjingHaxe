@@ -36,7 +36,7 @@ typedef SliderOptions = {
     A simple slider control
     Additional Signals: onchange
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Slider extends Control {
 
     var options: SliderOptions;

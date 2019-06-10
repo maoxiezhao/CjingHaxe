@@ -1,51 +1,37 @@
 package gui.mint.render.luxe;
 
-import luxe.Vector;
 import gui.mint.types.Types;
 import gui.mint.render.Rendering;
-
 import gui.mint.render.luxe.LuxeMintRender;
 import gui.mint.render.luxe.Convert;
 
-import phoenix.geometry.QuadGeometry;
-import luxe.Color;
-import luxe.Log.*;
+import gui.mint.render.CjingMintRender;
+import h2d.Graphics;
+import h2d.Sprite;
 
 private typedef LuxeMintCanvasOptions = {
-    var color: Color;
+    var color: UInt;
 }
 
 class Canvas extends gui.mint.render.Render {
 
     public var canvas : gui.mint.Canvas;
-    public var visual : QuadGeometry;
+    public var visual : h2d.Object;
 
-    public var color : Color;
+    public var color : UInt;
 
-    var render: LuxeMintRender;
+    var render: CjingMintRender;
 
-    public function new(_render:LuxeMintRender, _control:gui.mint.Canvas) {
-
+    public function new(_render:CjingMintRender, _control:gui.mint.Canvas) 
+    {
+        super(render, _control);
         canvas = _control;
         render = _render;
 
-        super(render, _control);
-
         var _opt: LuxeMintCanvasOptions = canvas.options.options;
+        color = 0x0c0c0c;
 
-        color = def(_opt.color, new Color(0,0,0,0).rgb(0x0c0c0c));
-
-        visual = Luxe.draw.box({
-            id: control.name+'.visual',
-            batcher: render.options.batcher,
-            x: sx,
-            y: sy,
-            w: sw,
-            h: sh,
-            color: color,
-            depth: render.options.depth + control.depth,
-            visible: control.visible,
-        });
+        visual = new h2d.Object(this);
 
         update_clip(scale);
 
@@ -53,7 +39,7 @@ class Canvas extends gui.mint.render.Render {
 
     function update_clip(_scale:Float) {
         
-        visual.clip_rect = Convert.clip_bounds(control.clip_with, render.options.batcher.view, _scale);
+        //visual.clip_rect = Convert.clip_bounds(control.clip_with, render.options.batcher.view, _scale);
 
     } //update_clip
 
@@ -65,15 +51,15 @@ class Canvas extends gui.mint.render.Render {
 
     override function ondestroy() {
 
-        visual.drop();
+        visual.remove();
         visual = null;
 
     } //ondestroy
 
     override function onbounds() {
 
-        visual.transform.pos.set_xy(sx, sy);
-        visual.resize_xy(sw, sh);
+        visual.x = sx;
+        visual.y = sy;
 
     } //onbounds
 
@@ -91,7 +77,7 @@ class Canvas extends gui.mint.render.Render {
 
     override function ondepth(_depth:Float) {
 
-        visual.depth = render.options.depth + _depth;
+        //visual.depth = render.options.depth + _depth;
 
     } //ondepth
 

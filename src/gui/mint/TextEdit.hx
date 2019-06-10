@@ -41,7 +41,7 @@ typedef TextEditOptions = {
     A simple text edit control
     Additional Signals: none
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class TextEdit extends Control {
 
     public var label : Label;

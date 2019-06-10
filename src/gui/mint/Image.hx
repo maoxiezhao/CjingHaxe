@@ -23,7 +23,7 @@ typedef ImageOptions = {
     A simple image control
     Additional Signals: onchange
 */
-@:allow(mint.render.Renderer)
+@:allow(gui.mint.render.Renderer)
 class Image extends Control {
 
     var options: ImageOptions;
