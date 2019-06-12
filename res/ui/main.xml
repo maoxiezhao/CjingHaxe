@@ -11,5 +11,9 @@
 			<scale_src scale="screen.height/1200"/>
 		</graphic>
 		<param type="string" value="scaledsrc"/>
+
+		<children>
+			<image id="back" src="map/tutorial_background" center_x="true" center_y="true" width="200" height="100" group="title"/>
+		</children>
 	</button>
 </data>

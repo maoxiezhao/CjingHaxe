@@ -4,8 +4,6 @@ import gui.UILoader;
 import gui.widgets.Frame;
 import gui.widgets.WidgetFactory;
 
-import gui.mint.Canvas;
-import gui.mint.render.CjingMintRender;
 // TODO 
 // will support layout
 class MainStage
@@ -28,14 +26,6 @@ class MainStage
         mUILoader = new UILoader(this);
 
         InitDefaultUI();
-
-        var renderging = new CjingMintRender();
-
-        var canvas = new gui.mint.Canvas({
-            name:'Root',
-            rendering : renderging,
-            x:0, y:0, w:800, h:600
-        });
     }
 
     public function InitDefaultUI()
