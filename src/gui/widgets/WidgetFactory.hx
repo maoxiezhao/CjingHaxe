@@ -170,9 +170,7 @@ class WidgetFactory
                 var graphicName = XMLHelper.XMLGetName(graphic.x);
                 var imageSrc = XMLHelper.XMLGetStr(graphic.x, "image");
                 var sliceIntArray = XMLHelper.XMLGetIntArray(graphic, "slice9");
-                var srcWidth:Int = Std.int(XMLHelper.XMLGetNumber(graphic.x, "src_w", 0));
-                var srcHeight:Int = Std.int(XMLHelper.XMLGetNumber(graphic.x, "src_h", 0));
-       
+
                 switch (graphicName)
                 {
                     case "normal":

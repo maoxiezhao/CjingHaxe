@@ -81,6 +81,8 @@ class App extends hxd.App
 
         super.update(dt);
 
+        mMainStage.Update(dt);
+
         mMainGame.Update(dt);
 
         // DEBUG
@@ -97,6 +99,8 @@ class App extends hxd.App
         super.dispose();
     
         mMainGame.Dispose();
+
+        mMainStage.Dispose();
 
         #if hl
         hxd.System.exit();

@@ -53,8 +53,10 @@ class UILoader
     {
         var frame = mMainStage.GetRootFrame();
         var newFrame = WidgetFactory.LoadFromData(data);
-
-        frame.addChild(newFrame);
+        if (newFrame != null) 
+        {
+            frame.addChild(newFrame);
+        }
         return frame;
     }
 }
