@@ -51,12 +51,6 @@ class UILoader
 
     public function ProcessXMLData(data:Access)
     {
-        var frame = mMainStage.GetRootFrame();
-        var newFrame = WidgetFactory.LoadFromData(data);
-        if (newFrame != null) 
-        {
-            frame.addChild(newFrame);
-        }
-        return frame;
+        return WidgetFactory.LoadFromData(data);
     }
 }
