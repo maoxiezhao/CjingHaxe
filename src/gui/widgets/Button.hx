@@ -2,33 +2,101 @@ package gui.widgets;
 
 import h2d.Tile;
 import h2d.Sprite;
+import gui.widgets.Image;
+
+enum UIButtonFrameIndex
+{
+    UIButtonFrameIndex_Normal;
+    UIButtonFrameIndex_Over;
+    UIButtonFrameIndex_Down;
+}
 
 class Button extends Frame
 {
-    public var mFrameIndeces:Array<Int>;
-    public var mFrameSprites:Array<h2d.Bitmap>;
+    private var mButtonImages:Map<UIButtonFrameIndex, Image>;
 
     public function new()
     {
         super();
 
-        mFrameIndeces = new Array();
+        mButtonImages = new Map();
     }
 
-    public function LoadImage(imageArray:Array<Image>, width:Int, height:Int)
+    override public function Initialize()
     {
-      
-        for (image in imageArray)
-        {
-            this.addChild(image);
+        super.Initialize();
+
+        var overImage = GetFrameImage(UIButtonFrameIndex_Over);
+        if (overImage != null) {
+            overImage.visible = false;
         }
 
-        // Button Frame:normal hover down
-        //this.addChild(src);
+        var downImage = GetFrameImage(UIButtonFrameIndex_Down);
+        if (downImage != null) {
+            downImage.visible = false;
+        }
+
+        var normalImage = GetFrameImage(UIButtonFrameIndex_Normal);
+        if (normalImage != null) {
+            normalImage.visible = true;
+        }
+
+        mInteraction.onOver = function(event : hxd.Event) {
+            OnOverHandler(event);
+        }
+
+        mInteraction.onOut = function(event : hxd.Event) {
+            OnOutHandler(event);
+        }
     }
 
-    private function ProcessScaleSlice(sliceArray:Array<Int>, srcImage:h2d.Bitmap, scaleX:Float, scaleY:Float)
+    public function LoadImage(imageArray:Array<Image>)
     {
+        for (image in imageArray) {
+            this.addFrameChild(image);
+        }
+    }
 
+    public function SetFrameImage(index:UIButtonFrameIndex, image:Image)
+    {
+        this.addFrameChild(image);
+        mButtonImages.set(index, image);
+    }
+
+    public function GetFrameImage(index:UIButtonFrameIndex)
+    {
+        return mButtonImages.get(index);
+    }
+
+    public function SetTargetFrameImageVisible(index:UIButtonFrameIndex)
+    {
+        for (image in mButtonImages) {
+            image.visible = false;
+        }
+
+        var targetImage = GetFrameImage(index);
+        if (targetImage != null) {
+            targetImage.visible = true;
+        }
+    }
+
+    public function OnOutHandler(event : hxd.Event)
+    {
+        SetTargetFrameImageVisible(UIButtonFrameIndex_Normal);
+    }
+
+    public function OnOverHandler(event : hxd.Event)
+    {
+        SetTargetFrameImageVisible(UIButtonFrameIndex_Over);
+    }
+
+    public function OnDownHandler(event : hxd.Event)
+    {
+        SetTargetFrameImageVisible(UIButtonFrameIndex_Down);
+    }
+
+    public function OnUpHandler(event : hxd.Event)
+    {
+        SetTargetFrameImageVisible(UIButtonFrameIndex_Normal);
     }
 }

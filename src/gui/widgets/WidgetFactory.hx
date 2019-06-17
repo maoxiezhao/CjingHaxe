@@ -27,6 +27,8 @@ class WidgetFactory
                 var frame = LoadFromTag(type, obj);
                 if (frame != null)
                 {
+                    frame.Initialize();
+
                     var isVisible:Bool = XMLHelper.XMLGetBool(data.x, "visible", true);
                     frame.visible = isVisible;
 
@@ -34,7 +36,7 @@ class WidgetFactory
                         frame.SetName(frameName);
                     }
 
-                    newFrame.addChild(frame);
+                    newFrame.addFrameChild(frame);
 
                     LoadPosition(obj, frame);
                 }
@@ -170,40 +172,41 @@ class WidgetFactory
                 var graphicName = XMLHelper.XMLGetName(graphic.x);
                 var imageSrc = XMLHelper.XMLGetStr(graphic.x, "image");
                 var sliceIntArray = XMLHelper.XMLGetIntArray(graphic, "slice9");
+                var srcWidth:Int = Std.int(XMLHelper.XMLGetNumber(graphic.x, "src_width", 0));
+                var srcHeight:Int = Std.int(XMLHelper.XMLGetNumber(graphic.x, "src_height", 0));
 
                 switch (graphicName)
                 {
                     case "normal":
                         var newImage = new Image();
-                        newImage.LoadSlice9Image(imageSrc, sliceIntArray);
+                        newImage.LoadSlice9Image(imageSrc, srcWidth, srcHeight, sliceIntArray);
                         newImage.SetName(graphicName);
                         imageArray[0] = newImage;
 
                     case "over" :
                         var newImage = new Image();
-                        newImage.LoadSlice9Image(imageSrc, sliceIntArray);
+                        newImage.LoadSlice9Image(imageSrc, srcWidth, srcHeight, sliceIntArray);
                         newImage.SetName(graphicName);
                         imageArray[1] = newImage;
 
                     case "down" :
                         var newImage = new Image();
-                        newImage.LoadSlice9Image(imageSrc, sliceIntArray);
+                        newImage.LoadSlice9Image(imageSrc, srcWidth, srcHeight, sliceIntArray);
                         newImage.SetName(graphicName);
                         imageArray[2] = newImage;
                     case "all" :
                         var newImage = new Image();
-                        newImage.LoadSlice9Image(imageSrc, sliceIntArray);
+                        newImage.LoadSlice9Image(imageSrc, srcWidth, srcHeight, sliceIntArray);
                         newImage.SetName(graphicName);
                         imageArray[0] = imageArray[1] = imageArray[2] = newImage;
                 }
             }
 
-            for (image in imageArray)
-            {
-                image.SetSize(width, height);
-            }
+            button.SetFrameImage(UIButtonFrameIndex_Normal, imageArray[0]);
+            button.SetFrameImage(UIButtonFrameIndex_Over,   imageArray[1]);
+            button.SetFrameImage(UIButtonFrameIndex_Down,   imageArray[2]);
 
-            button.LoadImage(imageArray, width, height);
+            button.SetSize(width, height);
         }
 
         return button;

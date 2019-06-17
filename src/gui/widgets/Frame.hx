@@ -1,5 +1,6 @@
 package gui.widgets;
 
+import hxd.Cursor;
 import haxe.xml.Access;
 import h2d.Object;
 import h2d.Sprite;
@@ -25,6 +26,7 @@ typedef UIEventParams = {
 class Frame extends h2d.Sprite
 {
     private var mName:String;
+    private var mFrameChild:Array<Frame>;
     private var mGraphics:h2d.Graphics;
     private var mInteraction:h2d.Interactive;
     private var mEventParamsMap:Map<UIEventType, UIEventParams>;
@@ -35,8 +37,10 @@ class Frame extends h2d.Sprite
         super();
         mGraphics = new h2d.Graphics(this);
         mInteraction = new h2d.Interactive(0, 0, this);
+        mInteraction.cursor = Cursor.Default;
 
         mEventParamsMap = new Map();
+        mFrameChild = new Array();
     }
 
     public function Initialize()
@@ -50,6 +54,8 @@ class Frame extends h2d.Sprite
 
     public function Dispose()
     {
+        mFrameChild = null;
+
         for (child in children)
         {
             var childFrame:Frame = cast(child, Frame);
@@ -84,5 +90,15 @@ class Frame extends h2d.Sprite
     {
         mInteraction.width = width;
         mInteraction.height = height;
+
+        for (child in mFrameChild)
+        {
+            child.SetSize(width, height);
+        }
     }
+
+    public function addFrameChild( s : Frame ) : Void {
+		this.addChild(s);
+        mFrameChild.push(s);
+	}
 }

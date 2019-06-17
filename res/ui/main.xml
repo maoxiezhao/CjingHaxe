@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>	
 	<button id="scaledsrc" center_x="true" x="100" y="100" group="top" label="SCALED SRC" width="200" height="200">
-		<graphic id="all" image="img/test" slice9="100,300,400,500">
+		<graphic id="all" image="img/test" slice9="15,15,180,180" src_width="200" src_height="200">
 			<scale_src scale="screen.height/1200"/>
 		</graphic>
 
