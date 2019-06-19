@@ -83,11 +83,13 @@ class Button extends Frame
     public function OnOutHandler(event : hxd.Event)
     {
         SetTargetFrameImageVisible(UIButtonFrameIndex_Normal);
+        FireEvent(UIEventType_MouseOut);
     }
 
     public function OnOverHandler(event : hxd.Event)
     {
         SetTargetFrameImageVisible(UIButtonFrameIndex_Over);
+        FireEvent(UIEventType_MouseOver);
     }
 
     public function OnDownHandler(event : hxd.Event)

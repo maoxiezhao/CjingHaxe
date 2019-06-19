@@ -27,7 +27,8 @@ class WidgetFactory
                 var frame = LoadFromTag(type, obj);
                 if (frame != null)
                 {
-                    frame.Initialize();
+                    LoadPosition(obj, frame);
+                    LoadCallbacks(obj, frame);
 
                     var isVisible:Bool = XMLHelper.XMLGetBool(data.x, "visible", true);
                     frame.visible = isVisible;
@@ -38,7 +39,7 @@ class WidgetFactory
 
                     newFrame.addFrameChild(frame);
 
-                    LoadPosition(obj, frame);
+                    frame.Initialize();
                 }
             }
         }   
@@ -57,6 +58,85 @@ class WidgetFactory
         var y:Float = XMLHelper.XMLGetY(data);
         frame.x = frame.x + x;
         frame.y = frame.y + y;
+    }
+
+    static public function LoadCallbacks(data:Access, frame:Frame)
+    {
+        if (data.hasNode.callback)
+        {
+            for (callback in data.nodes.callback)
+            {
+                if (callback.hasNode.onCreated) {
+                    ProcessCallbackData(callback.node.onCreated, UIEventType_OnCreated, frame);
+                }
+
+                if (callback.hasNode.onMouseOver) {
+                    ProcessCallbackData(callback.node.onMouseOver, UIEventType_MouseOver, frame);
+                }
+
+                if (callback.hasNode.onMouseOut) {
+                    ProcessCallbackData(callback.node.onMouseOut, UIEventType_MouseOut, frame);
+                }
+
+                if (callback.hasNode.onMouseClick) {
+                    ProcessCallbackData(callback.node.onMouseClick, UIEventType_MouseClick, frame);
+                }
+
+                if (callback.hasNode.onDisposed) {
+                    ProcessCallbackData(callback.node.onDisposed, UIEventType_OnDisposed, frame);
+                }
+            }
+        }
+    }
+
+    static public function GetParams(data:Access):Array<Dynamic>
+    {
+        var params:Array<Dynamic> = new Array();
+        if (data.hasNode.param) 
+        {
+            for (param in data.nodes.param) 
+            {
+                if(param.has.type && param.has.value)
+                {
+					var type:String = param.att.type.toLowerCase();
+					var valueStr:String = param.att.value;
+                    var value:Dynamic = valueStr;
+
+                    switch (type)
+                    {
+                        case "int" : value = Std.parseInt(valueStr);
+                        case "float": value = Std.parseFloat(valueStr);
+                        case "string": value = new String(valueStr);
+                        case "bool" : 
+                        {
+                            var boolStr = valueStr.toLowerCase();
+                            if (boolStr == "true" || boolStr == "1") {
+                                value = true;
+                            }
+                            else {
+                                value = false;
+                            }
+                        }
+                    }
+                    params.push(value);
+                }
+            }
+        }
+         
+        return params;
+    }
+
+    static public function ProcessCallbackData(callback:Access, eventType:UIEventType, frame:Frame)
+    {
+        var params:Array<Dynamic> = GetParams(callback);
+
+        var eventParams:UIEventParams = 
+        {
+            event : eventType,
+            name : XMLHelper.XMLGetStr(callback.x, "name"), 
+            params: params.copy()
+        };
+        frame.RegisterEvent(eventType, eventParams);
     }
 
     static public function CenterFrame(frame:Frame, centerX:Bool, centerY:Bool)

@@ -45,11 +45,7 @@ class Frame extends h2d.Sprite
 
     public function Initialize()
     {
-        var eventParams = mEventParamsMap.get(UIEventType_OnCreated);
-        if (eventParams != null)
-        {
-            FireEvent(UIEventType_OnCreated, eventParams);
-        }
+        FireEvent(UIEventType_OnCreated);
     }
 
     public function Dispose()
@@ -65,16 +61,12 @@ class Frame extends h2d.Sprite
             }
         }
 
-        var eventParams = mEventParamsMap.get(UIEventType_OnDisposed);
-        if (eventParams != null)
-        {
-            FireEvent(UIEventType_OnDisposed, eventParams);
-        }
-
+        FireEvent(UIEventType_OnDisposed);
+        
         removeChildren();
     }
 
-    public function FireEvent(event:UIEventType, params:UIEventParams)
+    private function FireEventImpl(event:UIEventType, params:UIEventParams)
     {
         if (mCurrentState != null)
         {
@@ -82,10 +74,32 @@ class Frame extends h2d.Sprite
         }
     }
 
+    public function FireEvent(event:UIEventType)
+    {
+        var eventParams = mEventParamsMap.get(event);
+        if (eventParams != null)
+        {
+            FireEventImpl(event, eventParams);
+        }
+    }
+
+    public function RegisterEvent(eventType:UIEventType, params:UIEventParams)
+    {
+        mEventParamsMap.set(eventType, params);
+    }
+
     public function Update(dt:Float) {}
     public function SetName(name:String) { mName = name; }
     public function GetName() { return mName;}
-    public function SetCurrentStage(state:UIState) {mCurrentState =  state;}
+    public function SetCurrentStage(state:UIState) 
+    {
+        mCurrentState =  state;
+        for (child in mFrameChild)
+        {
+            child.SetCurrentStage(state);
+        }
+    }
+    
     public function SetSize(width:Int, height:Int)
     {
         mInteraction.width = width;

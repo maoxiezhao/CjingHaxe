@@ -6,6 +6,8 @@ import gui.UIState;
 import gui.widgets.Frame;
 import gui.widgets.WidgetFactory;
 
+import game.ui.UITest;
+
 // TODO 
 // will support layout
 class MainStage
@@ -58,21 +60,18 @@ class MainStage
 
     public function LoadDefaultUIStates()
     {
-        LoadUIInstance("ui/main.xml", "main");
+        LoadUIInstance("ui/main.xml", "main", new UIMainState(this));
     }
 
-    public function LoadUIInstance(path:String, name:String)
+    public function LoadUIInstance(path:String, name:String, uiState:UIState)
     {
-        var newState = new UIState(this);
-        newState.SetRoot(mUILoader.ParseUIXML(path));
-        newState.Initialize();
+        uiState.SetRoot(mUILoader.ParseUIXML(path));
+        uiState.Initialize();
 
-        mRootFrame.addChild(newState.GetRoot());
+        mRootFrame.addChild(uiState.GetRoot());
 
-        mUIInstanceMap.set(name, newState);
-        mUIInstanceArray.push(newState);
-
-        return newState;
+        mUIInstanceMap.set(name, uiState);
+        mUIInstanceArray.push(uiState);
     }
 
     public function GetRootFrame() { return mRootFrame;}

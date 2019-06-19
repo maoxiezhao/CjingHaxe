@@ -31,5 +31,6 @@ class UIState
     public function SetRoot(frame:Frame)
     {
         mRoot = frame;
+        frame.SetCurrentStage(this);
     }
 }
