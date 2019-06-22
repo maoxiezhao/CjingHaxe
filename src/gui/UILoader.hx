@@ -16,11 +16,11 @@ class UILoader
         mMainStage = mainStage;
     }
 
-    public function ParseUIXML(id:String) 
+    public function ParseUIXML(id:String, currentState:UIState) 
     {
         var data:Access = LoadXML(id);
         if (data != null) {
-            return ProcessXMLData(data);
+            return ProcessXMLData(data, currentState);
         }
         return null;
     }
@@ -49,8 +49,8 @@ class UILoader
         }
     }
 
-    public function ProcessXMLData(data:Access)
+    public function ProcessXMLData(data:Access, currentState:UIState)
     {
-        return WidgetFactory.LoadFromData(data);
+        return WidgetFactory.LoadFromData(data, currentState);
     }
 }

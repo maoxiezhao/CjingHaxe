@@ -53,19 +53,16 @@ class MainStage
         mUILoader = new UILoader(this);
 
         // parse templates
-        mUILoader.ParseUIXML("templates/templates.xml");
+        mUILoader.ParseUIXML("templates/templates.xml", null);
 
-        LoadDefaultUIStates();
-    }
-
-    public function LoadDefaultUIStates()
-    {
+        // load default ui states
         LoadUIInstance("ui/main.xml", "main", new UIMainState(this));
     }
 
     public function LoadUIInstance(path:String, name:String, uiState:UIState)
     {
-        uiState.SetRoot(mUILoader.ParseUIXML(path));
+        var newFrame = mUILoader.ParseUIXML(path, uiState));
+        uiState.SetRoot(newFrame);
         uiState.Initialize();
 
         mRootFrame.addChild(uiState.GetRoot());

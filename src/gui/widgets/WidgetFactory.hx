@@ -10,12 +10,26 @@ import helper.System;
 
 class WidgetFactory
 {
+    public static var mDefinitionMap:Map<String, Access> = new Map();
     public static var mTagLoaderMap:Map<String, Access->Frame> = new Map();
 
-    public static function LoadFromData(data:Access)
+    public static function LoadFromData(data:Access, currentState:UIState)
     {
         var newFrame:Frame = new Frame();
 
+        // process widget definition
+        if (data.hasNode.definition)
+        {
+            for (defData in data.nodes.definition)
+            {
+                var defName = XMLHelper.XMLGetName(defData.x);
+                mDefinitionMap.set(defName, defData);
+
+                defData.x.parent.removeChild(defData.x);
+            }
+        }
+
+        // process widget elements
         if (data.x.firstElement() != null)
         {
             for(node in data.x.elements())
@@ -23,16 +37,26 @@ class WidgetFactory
                 var obj:Access = new Access(node);
                 var type = node.nodeName;
 
-                var frameName = XMLHelper.XMLGetName(node);
+                // 根据type创建widget，如果不是有效的type,则将node信息传到state中处理
+                // (在state::initialize()之前)
                 var frame = LoadFromTag(type, obj);
+                if (frame == null)
+                {
+                    if (currentState != null) {
+                        frame = currentState.RequestUIValue(type, obj);
+                    }
+                }
+
                 if (frame != null)
                 {
                     LoadPosition(obj, frame);
                     LoadCallbacks(obj, frame);
+                    ProcessChildren(obj, frame);
 
                     var isVisible:Bool = XMLHelper.XMLGetBool(data.x, "visible", true);
                     frame.visible = isVisible;
 
+                    var frameName = XMLHelper.XMLGetName(node);
                     if (frameName != "") {
                         frame.SetName(frameName);
                     }
@@ -137,6 +161,11 @@ class WidgetFactory
             params: params.copy()
         };
         frame.RegisterEvent(eventType, eventParams);
+    }
+
+    static public function ProcessChildren(data:Access, frame:Frame)
+    {
+
     }
 
     static public function CenterFrame(frame:Frame, centerX:Bool, centerY:Bool)
