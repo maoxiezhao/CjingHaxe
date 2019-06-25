@@ -19,6 +19,8 @@
 12. 简单GUI实现，进行中(50)
 12.1 优化Frame，移除派生为Sprite
 12.2 支持更多的widget: window,list
+12.3 GUI事件支持
+12.4 Frame size改变对children的影响
 13. 优化个人项目管理方式
 
 //////////////// TODO /////////////////////

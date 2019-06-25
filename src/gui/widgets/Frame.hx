@@ -100,6 +100,7 @@ class Frame extends h2d.Sprite
         }
     }
     
+    // TODO
     public function SetSize(width:Int, height:Int)
     {
         mInteraction.width = width;
@@ -112,6 +113,8 @@ class Frame extends h2d.Sprite
     }
 
     public function addFrameChild( s : Frame ) : Void {
+        if(s == this) {return;}
+
 		this.addChild(s);
         mFrameChild.push(s);
 	}

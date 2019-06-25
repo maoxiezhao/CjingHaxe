@@ -61,7 +61,7 @@ class MainStage
 
     public function LoadUIInstance(path:String, name:String, uiState:UIState)
     {
-        var newFrame = mUILoader.ParseUIXML(path, uiState));
+        var newFrame = mUILoader.ParseUIXML(path, uiState);
         uiState.SetRoot(newFrame);
         uiState.Initialize();
 

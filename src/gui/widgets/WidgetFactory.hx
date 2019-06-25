@@ -11,9 +11,9 @@ import helper.System;
 class WidgetFactory
 {
     public static var mDefinitionMap:Map<String, Access> = new Map();
-    public static var mTagLoaderMap:Map<String, Access->Frame> = new Map();
+    public static var mTagLoaderMap:Map<String, (Access, UIState)->Frame> = new Map();
 
-    public static function LoadFromData(data:Access, currentState:UIState)
+    public static function LoadFromData(data:Access, currentState:UIState, ?parentFrame:Frame)
     {
         var newFrame:Frame = new Frame();
 
@@ -39,7 +39,7 @@ class WidgetFactory
 
                 // 根据type创建widget，如果不是有效的type,则将node信息传到state中处理
                 // (在state::initialize()之前)
-                var frame = LoadFromTag(type, obj);
+                var frame = LoadFromTag(type, obj, currentState);
                 if (frame == null)
                 {
                     if (currentState != null) {
@@ -49,9 +49,9 @@ class WidgetFactory
 
                 if (frame != null)
                 {
-                    LoadPosition(obj, frame);
+                    LoadPosition(obj, frame, parentFrame);
                     LoadCallbacks(obj, frame);
-                    ProcessChildren(obj, frame);
+                    ProcessChildren(obj, frame, currentState);
 
                     var isVisible:Bool = XMLHelper.XMLGetBool(data.x, "visible", true);
                     frame.visible = isVisible;
@@ -72,11 +72,11 @@ class WidgetFactory
     }
 
     // TODO:support anchor
-    static public function LoadPosition(data:Access, frame:Frame)
+    static public function LoadPosition(data:Access, frame:Frame, parentFrame:Frame)
     {
         var isCenterX:Bool = XMLHelper.XMLGetBool(data.x, "center_x", false);
         var isCenterY:Bool = XMLHelper.XMLGetBool(data.x, "center_y", false);
-        CenterFrame(frame, isCenterX, isCenterY);
+        CenterFrame(frame, isCenterX, isCenterY, parentFrame);
 
         var x:Float = XMLHelper.XMLGetX(data);
         var y:Float = XMLHelper.XMLGetY(data);
@@ -163,16 +163,27 @@ class WidgetFactory
         frame.RegisterEvent(eventType, eventParams);
     }
 
-    static public function ProcessChildren(data:Access, frame:Frame)
+    static public function ProcessChildren(data:Access, frame:Frame, currentState:UIState)
     {
-
+        if (data.hasNode.children)
+        {
+            for (child in data.nodes.children)
+            {
+                var newFrame = LoadFromData(child, currentState, frame);
+                frame.addFrameChild(newFrame);
+            }
+        }
     }
 
-    static public function CenterFrame(frame:Frame, centerX:Bool, centerY:Bool)
+    static public function CenterFrame(frame:Frame, centerX:Bool, centerY:Bool, parentFrame:Frame)
     {
         var frameBounds = frame.getBounds();
         var parent = cast(frame.parent, Frame);
-        if (parent != null && parent.GetName() != "Root")
+        if (parent == null) {
+            parent = parentFrame;
+        }
+
+        if (parent != null &&  parent.GetName() != "Root")
         {
             var parentBounds = parent.getBounds();
             if (centerX) {
@@ -195,22 +206,28 @@ class WidgetFactory
         }
     }
 
-    public static function LoadFromTag(tag:String, info:Access)
+    public static function LoadFromTag(tag:String, info:Access, currentState:UIState)
     {
         var loader = mTagLoaderMap.get(tag);
         if (loader == null) {
             return null;
         }
-        return loader(info);
+        return loader(info, currentState);
     }
 
     public static function Initialize()
     {
+        mTagLoaderMap.set("frame", LoadFrame);
         mTagLoaderMap.set("image", LoadImage);
         mTagLoaderMap.set("button", LoadButton);
     }
 
-    public static function LoadImage(info:Access):Frame
+    public static function LoadFrame(info:Access, currentState:UIState):Frame
+    {
+        return LoadFromData(info, currentState);
+    }
+
+    public static function LoadImage(info:Access, currentState:UIState):Frame
     {
         var image:Image = new Image();
         var srcImage = LoadScaledImage(info);
@@ -261,7 +278,7 @@ class WidgetFactory
         return null;
     }
 
-    public static function LoadButton(info:Access):Frame
+    public static function LoadButton(info:Access, currentState:UIState):Frame
     {
         var button:Button = new Button();
 
