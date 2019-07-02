@@ -13,15 +13,14 @@
 9. entity state 第一版（100），但是目前和AnimState有点重复，需要考虑下。。。
 10.Camera,非拖拽窗口，平滑移动 第一版(100)
 11.Entities管理结构调整（100）
- 
+12.简易的GUI结构实现 （100）
+
 //////////////// ONGOING /////////////////
 
-12. 简单GUI实现，进行中(50)
-12.1 优化Frame，移除派生为Sprite
-12.2 支持更多的widget: window,list
-12.3 GUI事件支持
-12.4 Frame size改变对children的影响
-13. 优化个人项目管理方式
+1. logic scene system 
+1. Grid 管理 (优先级***) (NOW!!!!)
+1. detector对象实现
+1. 粒子接入（接入heaps的粒子系统）
 
 //////////////// TODO /////////////////////
 // LOGIC
@@ -29,10 +28,9 @@
 2. 关卡切换
 
 // EFFECt
-1. 粒子接入（接入heaps的粒子系统）
 
 // SYSTEM
-1. Grid 管理 (优先级***) (NOW!!!!)
+
 2. 资源加载管理支持(50) Assets.hx
 
 // design
@@ -48,4 +46,6 @@
 3. 动画状态机优化
 4. camera的优化
 
-
+// GUI
+1 优化Frame，移除派生为Sprite
+2 支持更多的widget: window,list

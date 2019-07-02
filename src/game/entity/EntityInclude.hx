@@ -5,6 +5,7 @@ enum EntityType
     EntityType_Unknown;
     EntityType_Hero;
     EntityType_Camera;
+    EntityType_Pickable;
 }
 
 // TODO realize an in-entity event system

@@ -29,6 +29,8 @@ class GameMap
     public var mMaxLayers :Int = 3;
     public var mCellGroundWidth:Int = 32;
     public var mCellGroundHeight:Int = 32;
+    public var mGridCellWidth:Int = 128;
+    public var mGridCellHeight:Int = 128;
 
     private var mScroller:h2d.Layers;
     private var mBackground:h2d.Bitmap = null;

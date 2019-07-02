@@ -1,6 +1,8 @@
 package game.entity;
 
 import helper.Log;
+import helper.System;
+import helper.Grid;
 import game.GameCommand;
 import game.entity.MapTile;
 import game.GameMap;
@@ -11,6 +13,7 @@ class Entities
     private var mAllEntities:List<Entity>;
     private var mEntitiesToRemoved:Array<Entity>;
     private var mEntitiesNameMap:Map<String, Entity>;
+    private var mEntitiesGrid:Grid<Entity>;
 
     private var mCurrentMap:GameMap;
     private var mCurrentLayers:Array<h2d.Layers>;
@@ -31,6 +34,11 @@ class Entities
         mEntitiesNameMap = new Map();
         mCurrentLayers = new Array();
         mLayerGrounds = new Array();
+
+        mEntitiesGrid = new Grid<Entity>(
+            map.mMapWidth, map.mMapHeight, 
+            map.mGridCellWidth, map.mGridCellHeight
+        );
 
         mCurrentMap = map;
         mMapTileRowNumber = map.mMapTileRowNumber;
@@ -68,6 +76,10 @@ class Entities
         for(entity in mAllEntities) {
             entity.Dispose();
         }
+
+        mEntitiesGrid.Clear();
+        mEntitiesGrid = null;
+
         mAllEntities = null;
         mEntitiesToRemoved = null;
         mEntitiesNameMap = null;
