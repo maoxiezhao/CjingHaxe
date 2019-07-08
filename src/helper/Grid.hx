@@ -3,10 +3,11 @@ package helper;
 import game.MapLoader.MapData;
 import h2d.col.Bounds;
 import hxd.clipper.Rect;
+import helper.BaseObject;
 
-class GridCell<T> 
+class GridCell
 {
-    private var mObjects:Array<T>;
+    private var mObjects:Array<BaseObject>;
 
     public function new()
     {
@@ -20,17 +21,17 @@ class GridCell<T>
     {
         return mObjects;
     }
-    public function AddElement(object:T)
+    public function AddElement(object:BaseObject)
     {
         mObjects.push(object);
     }
-    public function Remove(object:T)
+    public function Remove(object:BaseObject)
     {
         return mObjects.remove(object);
     }
-};
+}
 
-class Grid<T> 
+class Grid
 {
     private var mWidth:Int;
     private var mHeight:Int;
@@ -38,17 +39,25 @@ class Grid<T>
     private var mCellHeight:Int;
     private var mCols:Int;
     private var mRows:Int;
-    private var mCells:Array<GridCell<T>>;
-    private var mAllElementMap:Map<T, Bounds>;
+    private var mCells:Array<GridCell>;
+    private var mAllElementMap:Map<UInt, Bounds>;
 
     public function new(width:Int, height:Int, cellWidth:Int, cellHeight:Int)
     {
         mCols = Math.floor(width / cellWidth) + (width % cellWidth != 0 ? 1:0);
         mRows = Math.floor(height / cellHeight) + (height % cellHeight != 0 ? 1:0);
+        mCellWidth = cellWidth;
+        mCellHeight = cellHeight;
+        mWidth = width;
+        mHeight = height;
 
         mAllElementMap = new Map();
         mCells = new Array();
         mCells.resize(mCols * mRows);
+         for(index in 0 ... mCols * mRows)
+         {
+             mCells[index] = new GridCell();
+         }
     }
 
     public function Clear()
@@ -59,9 +68,9 @@ class Grid<T>
         mCells.resize(0);
     }
 
-    public function Add(element:T, boundingBox:Bounds)
+    public function Add(element:BaseObject, boundingBox:Bounds)
     {
-        if (mAllElementMap.get(element) != null) {
+        if (mAllElementMap.get(element.GetHashKey()) != null) {
             return;
         }
 
@@ -70,13 +79,13 @@ class Grid<T>
         var rowStart = Math.floor(boundingBox.y / mCellHeight);
         var rowEnd   = Math.floor((boundingBox.y + boundingBox.height - 1) / mCellHeight);
 
-        for(row in rowStart ... rowEnd)
+        for(row in rowStart ... rowEnd + 1)
         {
             if (row < 0 || row >= mRows) {
                 continue;
             }
 
-            for(col in colStart ... colEnd)
+            for(col in colStart ... colEnd + 1)
             {
                 if(col < 0 || col >= mCols) {
                     continue;
@@ -87,27 +96,27 @@ class Grid<T>
             }
         }
 
-        mAllElementMap.set(element, boundingBox);
+        mAllElementMap.set(element.GetHashKey(), boundingBox);
     }
 
-    public function Remove(element:T, boundingBox:Bounds)
+    public function Remove(element:BaseObject, boundingBox:Bounds)
     {
         var result:Bool = false;
 
-        if (mAllElementMap.get(element) != null) {
-            ForeachGridCellByBoundingBox(boundingBox, function(cell:GridCell<T>){
+        if (mAllElementMap.get(element.GetHashKey()) != null) {
+            ForeachGridCellByBoundingBox(boundingBox, function(cell:GridCell){
                 result = result || cell.Remove(element);
             });
 
-            mAllElementMap.remove(element);
+            mAllElementMap.remove(element.GetHashKey());
         }
 
         return result;
     }
 
-    public function Move(element:T, newBoundingBox:Bounds)
+    public function Move(element:BaseObject, newBoundingBox:Bounds)
     {
-        var boundingBox = mAllElementMap.get(element)
+        var boundingBox = mAllElementMap.get(element.GetHashKey());
         if (boundingBox != null) 
         {
             if (boundingBox == newBoundingBox){
@@ -127,7 +136,7 @@ class Grid<T>
         return GetElementsByCellIndex(row * mCols + col);
     }
 
-    public function GetElementsByCellIndex(index:Int):Array<T>
+    public function GetElementsByCellIndex(index:Int):Array<BaseObject>
     {
         if (index >= 0 && index < mCols * mRows) {
             return mCells[index].GetElements();
@@ -144,9 +153,8 @@ class Grid<T>
         var rowStart = Math.floor(boundingBox.y / mCellHeight);
         var rowEnd   = Math.floor((boundingBox.y + boundingBox.height - 1) / mCellHeight);
 
-        var elements:Array<T> = new Array();
-        var addedElements:Map<T, Bool> = new Map<T, Bool>();
-
+        var elements:Array<BaseObject> = new Array();
+        var addedElements:Map<UInt, Bool> = new Map();
         for(row in rowStart ... rowEnd)
         {
             if (row < 0 || row >= mRows) {
@@ -163,9 +171,9 @@ class Grid<T>
                 var cellElements = mCells[index].GetElements();
                 for (element in cellElements)
                 {
-                    if (addedElements.get(element) == null)
+                    if (addedElements.get(element.GetHashKey()) == null)
                     {
-                        addedElements.set(element, true);
+                        addedElements.set(element.GetHashKey(), true);
                         elements.push(element);
                     }
                 }
@@ -175,7 +183,7 @@ class Grid<T>
     }
 
 
-    public function ForeachGridCellByBoundingBox(boundingBox:Bounds, func:GridCell<T>->Void)
+    public function ForeachGridCellByBoundingBox(boundingBox:Bounds, func:GridCell->Void)
     {
         var colStart = Math.floor(boundingBox.x / mCellWidth);
         var colEnd   = Math.floor((boundingBox.x + boundingBox.width - 1) / mCellWidth);

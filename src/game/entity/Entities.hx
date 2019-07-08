@@ -6,6 +6,7 @@ import helper.Grid;
 import game.GameCommand;
 import game.entity.MapTile;
 import game.GameMap;
+import game.component.BoundingBox;
 
 // manage all entities
 class Entities
@@ -13,7 +14,7 @@ class Entities
     private var mAllEntities:List<Entity>;
     private var mEntitiesToRemoved:Array<Entity>;
     private var mEntitiesNameMap:Map<String, Entity>;
-    private var mEntitiesGrid:Grid<Entity>;
+    private var mEntitiesGrid:Grid;
 
     private var mCurrentMap:GameMap;
     private var mCurrentLayers:Array<h2d.Layers>;
@@ -35,7 +36,7 @@ class Entities
         mCurrentLayers = new Array();
         mLayerGrounds = new Array();
 
-        mEntitiesGrid = new Grid<Entity>(
+        mEntitiesGrid = new Grid(
             map.mMapWidth, map.mMapHeight, 
             map.mGridCellWidth, map.mGridCellHeight
         );
@@ -101,6 +102,13 @@ class Entities
             if (name != "") {
                 mEntitiesNameMap.remove(name);
             } 
+
+            var boundingBoxs = entity.GetComponents().GetComponentsByType(ComponentType_BoundingBox);
+            if (boundingBoxs.length > 0)
+            {
+                var boundingBox:BoundingBox = cast(boundingBoxs[0], BoundingBox);
+                mEntitiesGrid.Remove(entity, boundingBox.mBound);
+            }
         }
         if (mDebugObstacleEnable)
         {
@@ -150,6 +158,16 @@ class Entities
         if (entity.GetEntityType() == EntityType_Hero) 
         {
             mCamera.TraceTarget(entity);
+        }
+
+        if (entity.GetEntityType() != EntityType_Camera)
+        {
+            var boundingBoxs = entity.GetComponents().GetComponentsByType(ComponentType_BoundingBox);
+            if (boundingBoxs.length > 0)
+            {
+                var boundingBox:BoundingBox = cast(boundingBoxs[0], BoundingBox);
+                mEntitiesGrid.Add(entity, boundingBox.mBound);
+            }
         }
 
         entity.SetLayer(layerIndex);

@@ -11,10 +11,11 @@ import helper.AnimationSprite;
 import helper.AnimationOptionLoader;
 import helper.AnimationManager;
 import helper.CoolDownTimer;
+import helper.BaseObject;
 
 // base entity class
 // TODO: 1.add paused status 
-class Entity
+class Entity extends BaseObject
 {
     private var mName:String = "";
     private var mLayer:Int = 1;
@@ -44,6 +45,7 @@ class Entity
 
     public function new(name:String, entityType:EntityType)
     {
+        super();
         mName = name;
         mEntityType = entityType;
         mBaseObject = new Object();
