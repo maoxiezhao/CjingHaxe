@@ -1,0 +1,55 @@
+[
+    {
+        "name":"test",
+        "texture":"particles/dust.png",
+        "sortMode":"None",
+        "blendMode":"Alpha",
+        "emitLoop":false,
+        "nparts":5,
+        "life":5,
+        "lifeRand":0.5,
+
+        "emitMode":"Point",
+        "emitDist":0,
+        "emitDistY":0,
+
+        "speed":5,
+        "speedIncr":0,
+        "speedRand":0.5,
+
+        "rotSpeed":0,
+        "rotInit":0,
+
+        "size":0.5,
+        "sizeRand":0.2,
+        "sizeIncr":0.1,
+
+        "gravity":1,
+
+        "emitDirectionAsAngle":false,
+        "fadeIn":0.0,
+        "fadeOut":0.8,
+        "isRelative":true,
+        "fadePower":10,
+        "rebuildOnChange":true,
+        "enable":true,
+  
+        "emitAngle":-0.5,
+        "sinGravityAngle":0,
+        "rotAuto":false,
+        "incrX":true,
+        "incrY":true,
+        "dx":0,
+        "dy":0,
+        "emitSync":0,
+        "frameDivisionX":1,
+        "frameDivisionY":1,
+        "rotSpeedRand":0,
+        "frameCount":0,
+        "emitDelay":0,
+        "animationRepeat":1,
+        "cosGravityAngle":0,
+        "emitStartDist":0
+    }
+]
+  

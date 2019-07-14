@@ -5,6 +5,7 @@ import helper.AnimationSprite;
 import hxd.Key;
 import hxd.res.Image;
 import hxd.Res;
+import helper.ParticleInst;
 import helper.Animation.AnimationOption;
 import game.animationStates.NormalEntity;
 import game.GameCommand;
@@ -18,7 +19,8 @@ import game.entity.entityStates.PlayerNormalState;
 //  对相同按键不同的响应
 class Hero extends Entity
 {
-    var mBody:AnimationSprite;
+    private var mBody:AnimationSprite;
+    private var mParticleInst:ParticleInstance;
 
     public function new()
     {
@@ -47,6 +49,17 @@ class Hero extends Entity
         components.Add(boundingBox);
 
         SetState(new PlayerWalkingState(this, "walking"));
+    }
+
+    override public function OnEnterMap()
+    {
+        var map = GetCurrentMap();
+        mParticleInst = map.GetOrCreateParticleInst("dust");
+    }
+
+    override public function OnLeaveMap()
+    {
+
     }
 
     override function Update(dt:Float)

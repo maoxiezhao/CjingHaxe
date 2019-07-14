@@ -5,6 +5,7 @@ import game.entity.Camera;
 import game.entity.Entity;
 import game.entity.Entities;
 import game.entity.MapTile;
+import helper.ParticleInst;
 
 import helper.Log;
 
@@ -35,6 +36,7 @@ class GameMap
     private var mScroller:h2d.Layers;
     private var mBackground:h2d.Bitmap = null;
     private var mEntities:Entities;
+    private var mParticles:Map<String, ParticleInstance>;
 
     public function new(currentGame:Game)
     {
@@ -42,6 +44,7 @@ class GameMap
         
         mScroller = new h2d.Layers();
         currentGame.mRootLayer.add(mScroller, 9);
+        mParticles = new Map();
     }
 
     public function Dispose()
@@ -51,6 +54,7 @@ class GameMap
         mScroller.removeChildren();
         mScroller.remove();
 
+        mParticles = null;
         mCurrentGame = null;
     }
 
@@ -100,6 +104,24 @@ class GameMap
     public function GetScroller() { return mScroller;}
     public function GetMaxLayer() { return mMaxLayers;}
     public function GetEntities() { return mEntities; }
+
+    public function AddEntity(entity:Entity)
+    {
+        mEntities.AddEntity(entity);
+        entity.SetCurrentMap(this);
+        entity.OnEnterMap();
+    }
+
+    public function GetOrCreateParticleInst(path:String)
+    {
+        var inst = mParticles.get(path);
+        if (inst == null)
+        {
+            inst = ParticleInstance.Load(path, mScroller);
+            mParticles.set(path, inst);
+        }
+        return inst;
+    }
 
     //**********************************************************************/
     // Check Collision

@@ -11,6 +11,8 @@ import hxd.System;
 import helper.Log;
 import helper.System;
 import gui.MainStage;
+import logic.LogicScene;
+import logic.MainScene;
 
 typedef AppOptions = {
     ?name:String,
@@ -22,7 +24,7 @@ typedef AppOptions = {
 class App extends hxd.App 
 {
     public static var mAppOptions(get, null):AppOptions;
-    public static var mMainGame:Game;
+    public static var mSceneManager:LogicSceneManager;
     public static var mMainStage:MainStage;
     public var isClosed:Bool = false;
 
@@ -62,14 +64,16 @@ class App extends hxd.App
         #end
 
         mMainStage = new MainStage(this.s2d);
-
-        mMainGame = new Game(this);
+        mSceneManager = new LogicSceneManager(this);
+        mSceneManager.RequsetScene(new MainScene(mSceneManager));
 
         onResize();
 
         // DEBUG
         var font : h2d.Font = hxd.res.DefaultFont.get();
-        mFPSText = new h2d.Text(font, s2d);
+        mFPSText = new h2d.Text(font);
+        
+        s2d.addChildAt(mFPSText, 1);
     }
 
     override function update(dt:Float)
@@ -82,8 +86,7 @@ class App extends hxd.App
         super.update(dt);
 
         mMainStage.Update(dt);
-
-        mMainGame.Update(dt);
+        mSceneManager.Update(dt);
 
         // DEBUG
         mFPSText.text =  "DRAW_CALLS:" + Std.string(engine.drawCalls) + "   FPS:" + Std.string(Math.ceil(Timer.fps()));
@@ -98,8 +101,7 @@ class App extends hxd.App
     {
         super.dispose();
     
-        mMainGame.Dispose();
-
+        mSceneManager.Dispose();
         mMainStage.Dispose();
 
         #if hl

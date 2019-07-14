@@ -171,7 +171,6 @@ class Entities
         }
 
         entity.SetLayer(layerIndex);
-        entity.SetCurrentMap(mCurrentMap);
     }
 
     public function RemoveEntity(entity:Entity)

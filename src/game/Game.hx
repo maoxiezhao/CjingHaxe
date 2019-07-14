@@ -27,10 +27,13 @@ class Game
 
         mGameCommandManager = new GameCommandManager(this);
         mGameCommandManager.BindDefaultCommand();
+    }
 
+    public function Initialize()
+    {
         Logger.Info("The Game Staring.");
         mCurrentMap.LoadMap("tutorial");
-        mCurrentMap.GetEntities().AddEntity(mHero);
+        mCurrentMap.AddEntity(mHero);
     }
 
     public function Update(dt:Float)

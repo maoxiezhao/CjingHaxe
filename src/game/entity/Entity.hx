@@ -243,4 +243,7 @@ class Entity extends BaseObject
     }
 
     public function GetIsBeRemoved() { return mIsBeRemoved; }
+    public function GetBaseObject() { return mBaseObject; }
+    public function OnEnterMap(){}
+    public function OnLeaveMap(){}
 }
